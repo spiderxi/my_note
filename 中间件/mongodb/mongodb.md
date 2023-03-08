@@ -76,7 +76,7 @@ rs.addArb() //添加仲裁节点
 
 存储数据的副本集和配置服务器的副本集, 路由服务器副本集合起来就是一个分片集群
 
-路由节点启动程序是`mongos.exe`, 其他节点是 `mongod.exe`
+路由节点启动程序是 `mongos.exe`, 其他节点是 `mongod.exe`
 
 ![1678258879646](image/mongodb/1678258879646.png)
 
@@ -86,7 +86,6 @@ rs.addArb() //添加仲裁节点
 sharding:
   clusterRole: shardsvr # 表示改节点是一个存储数据的副本集中的一个节点, 如果时配置服务器就设置为configsvr
 ```
-
 
 配置路由实例的配置副本集
 
@@ -194,3 +193,77 @@ age: {"$and": [{"$gt": 18}, {"$lt": 60}]
 ```
 
 # 3. Spring data整合
+
+```xml
+        <!---Spring-data-mongodb-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+```
+
+## 3.1 配置类
+
+```java
+@Configuration
+@EnableMongoRepositories(basePackages = "xyz.mall.nosql.mongo")
+public class MongoConfig extends AbstractMongoClientConfiguration {
+    @Override
+    protected String getDatabaseName() {
+        return "mall";
+    }
+    @Bean
+    public MongoClient mongoClient() {
+        return MongoClients.create("mongodb://localhost:27017");
+    }
+}
+
+```
+
+## 3.2 添加文档实体类
+
+```java
+@Document(indexName = "default")
+@Data
+public class MemberReadHistory {
+    @Id
+    private String id;
+    @Indexed
+    private Long memberId;
+    private String memberNickname;
+    private String memberIcon;
+    @Indexed
+    private Long productId;
+    private String productName;
+    private String productPic;
+    private String productSubTitle;
+    private String productPrice;
+    private Date createTime;
+}
+```
+
+## 3.3 编写与数据库交互的接口
+
+```java
+public interface MemberReadHistoryRepository extends MongoRepository<MemberReadHistory, String> {
+    /**
+     * 根据会员id按时间倒序获取浏览记录
+     * @param memberId 会员id
+     */
+    List<MemberReadHistory> findByMemberIdOrderByCreateTimeDesc(Long memberId);
+}
+```
+
+这个接口会被框架自动实现并注入到Ioc容器中
+
+## 3.4 使用接口
+
+```java
+    @Resource
+    MemberReadHistoryRepository readHistoryRepository;
+
+    @Test
+    void contextLoads() {
+        System.out.println(readHistoryRepository.count());
+    }
+```

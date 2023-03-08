@@ -247,17 +247,7 @@ public class EsProduct implements Serializable {
 
 Spring data 中 操作ES有两种方式, 一种继承ElasticsearchRepository接口, 另一种使用ElasticsearchRestTemplate, 这里介绍使用ElasticsearchRepository的方式
 
-先在配置中开启对Repository的支持
-
-```yml
-spring:
-  data:
-    elasticsearch:
-      repositories:
-        enabled: true # 开启ElasticsearchRepository支持
-```
-
-并继承ElasticsearchRepository接口
+继承ElasticsearchRepository接口后的这个接口会被框架自动实现和注入
 
 ```java
 //继承ElasticsearchRepository<文档类型, 主键类型>, 该接口由Spring data创建实现类并注册为bean
@@ -275,10 +265,11 @@ public interface EsProductRepository extends ElasticsearchRepository<EsProduct, 
 
 ## 2.3 配置
 
-在配置类中注册RestHighLevelClient
+在配置类中注册RestHighLevelClient, 并开启ESRepository的自动实现接口功能
 
 ```java
 @Configuration
+@EnableElasticsearchRepositories(basePackages = "xyz.mall.nosql.es")
 public class SpringDataESConfig extends AbstractElasticsearchConfiguration {
     @Value("${es.hosts}")
     private String[] hosts;
@@ -298,7 +289,7 @@ public class SpringDataESConfig extends AbstractElasticsearchConfiguration {
         RestHighLevelClient client = RestClients.create(configuration).rest();
         return client;
     }
-
+}
 ```
 
 多个es服务器的集群使用逗号连接
