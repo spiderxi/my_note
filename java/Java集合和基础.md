@@ -397,3 +397,59 @@ Java集合的体系
             System.out.println(s);
         }
 ```
+
+## 2.2 ArrayList&Vector&LinkedList
+
+### 2.2.1 ArrayList
+
+* **ArrayList底层使用Object数组**
+  ```java
+  transient Object[] elementData; // non-private to simplify nested class access
+  ```
+* ArrayLsit线程不安全, Vector线程安全
+
+默认数组长度==0,  第一次add()时会设置数组长度为10
+
+```java
+        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+            return Math.max(DEFAULT_CAPACITY, minCapacity);
+        }
+```
+
+**数组空间不足时扩容到1.5倍**, 扩容后超出最大容量需要额外处理
+
+```java
+int newCapacity = oldCapacity + (oldCapacity >> 1);
+```
+
+### 2.2.2 Vector
+
+Vector底层也是使用Object数组, 默认大小==10, **容量不足时扩容capacityIncrement(默认扩容两倍)**
+
+```java
+        int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
+                                         capacityIncrement : oldCapacity);
+```
+
+方法基本为同步方法, 线程安全
+
+```java
+    public synchronized void addElement(E obj) {
+        modCount++;
+        ensureCapacityHelper(elementCount + 1);
+        elementData[elementCount++] = obj;
+    }
+```
+
+### 2.2.3 LinkedList
+
+移除列表中的节点时, 需要将pre, item, next指针置空防止内存泄漏
+
+原因: 节点虽然从LinkedList中删除, 但是如果可以通过其他方式可达该节点, 那么这个节点的next, item, pre也可达, 可能导致gc不能识别出垃圾
+
+```java
+        f.item = null;
+        f.next = null; // help GC
+```
+
+## 2.3 HashSet&TreeSet
