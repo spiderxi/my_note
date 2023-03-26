@@ -376,3 +376,24 @@ ServiceLoader的代码
 ```
 
 # 2. Java集合
+
+Java集合的体系
+
+![1679860238832](image/Java集合和基础/1679860238832.png)
+
+## 2.1 Collection
+
+迭代器遍历
+
+```java
+        Collection<String> collection = new ArrayList<String>(){{add("jack"); add("jerry");}};
+        // Collection的迭代器遍历
+        Iterator iterator = collection.iterator();
+        while (iterator.hasNext()){
+            System.out.println(iterator.next());
+        }
+        //增强for遍历Collection本质是使用迭代器
+        for (String s: collection){
+            System.out.println(s);
+        }
+```
