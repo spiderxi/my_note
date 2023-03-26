@@ -242,13 +242,15 @@ JDK8后方法区和的metaspace和NIO direct buffer都使用直接内存
 
 ## 2.3 普通对象的存储结构
 
-一个OO的存储空间被划分为: Header + Instance Data +Padding
+一个OO的存储空间被划分为: Header(markword+classPointer) + Instance Data +Padding
 
-header
+header(8+8字节)
 
-```
-hashcode(Object.hashCode返回值) + GC分代年龄等对象元数据 + 指向类型元数据的指针(句柄的对象访问方式下可能没有该指针) + 锁信息 + ...
-```
+markword(8Byte)
+
+![1679639019786](image/jvm/1679639019786.png)
+
++ classPointer(8Byte)
 
 Instance Data
 
@@ -459,8 +461,6 @@ JDK8默认GC: Parallel + Parallel Old
 将内存分成2048各个区域
 
 ![1678952428695](image/jvm/1678952428695.png)
-
-
 
 ## 3.7 四种Reference类型
 
