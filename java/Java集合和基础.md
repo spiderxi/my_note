@@ -375,6 +375,53 @@ ServiceLoader的代码
         });
 ```
 
+
+
+## 1.10 基本类型
+
+常用基本类型
+
+```
+byte char(注意JAVA中char类型为2字节, 使用unicode编码, char不存在自动类型提升) short int long float double
+```
+
+类型等级与**自动类型提升**
+
+```
+byte -> short -> int -> long -> float -> double
+```
+
+低等级可以赋值给高等级(高等级不可以赋值给低等级)
+
+```java
+        int i = 'a';
+        short s = 'a';
+        float f = 123L;
+        int j = 12d;//编译报错
+```
+
+低等级和高等级运算结果为高等级(+=, -=运算符会强制转型)
+
+```java
+        short s1 = 1;
+        s1 += 1;
+        short s2 = s1 + 1;//编译报错
+```
+
+强制转型
+
+```java
+int i = (int) 123.3d;
+```
+
+自动装箱为包装类
+
+```java
+        Integer i = 128, j = 127, k = 128, m = 127;
+        System.out.println(i == k);//false
+        System.out.println(j == k);//true, Integer.IntegerCache
+```
+
 # 2. Java集合
 
 Java集合的体系
@@ -398,7 +445,7 @@ Java集合的体系
         }
 ```
 
-## 2.2 ArrayList&Vector&LinkedList
+## 2.2 List
 
 ### 2.2.1 ArrayList
 
@@ -452,4 +499,162 @@ Vector底层也是使用Object数组, 默认大小==10, **容量不足时扩容c
         f.next = null; // help GC
 ```
 
-## 2.3 HashSet&TreeSet
+## 2.3 Set&Map
+
+### 2.3.1 HashSet
+
+HashSet底层使用HashMap, key=元素, value=同一个占位Object
+
+```java
+//HashSet的add()
+public boolean add(E e) {
+    return map.put(e, PRESENT)==null; //private static final Object PRESENT = new Object();
+}
+```
+
+### 2.3.2 HashMap
+
+HashMap底层是**散列表+红黑树**
+
+根据Hash值后(n-1)位获取散列表索引, 索引位置没有链表时, 直接插入
+
+```java
+        if ((p = tab[i = (n - 1) & hash]) == null)
+            tab[i] = newNode(hash, key, value, null);
+```
+
+当存在链表时, 顺着链表查找, **根据==和equals()比较逻辑是否相等**, 相等返回该值
+
+```java
+            if (p.hash == hash &&
+                ((k = p.key) == key || (key != null && key.equals(k))))
+                e = p;
+```
+
+到链表末尾时, 插入节点并检查查找长度是否超过树化阈值且散列表长度是否>=64, 超过则将链表转为红黑树
+
+```java
+                    if ((e = p.next) == null) {
+                        p.next = newNode(hash, key, value, null);
+                        if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
+                            treeifyBin(tab, hash);
+                        break;
+                    }
+```
+
+如果总的节点数超过阈值, 扩容散列表
+
+```java
+        if (++size > threshold)
+            resize();
+```
+
+扩容逻辑: 散列表长度 ×= 2, 总节点数阈值 ×= 2, **初始总节点数阈值 = 初始散列表长度(16) * 3/4**
+
+```java
+            else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
+                     oldCap >= DEFAULT_INITIAL_CAPACITY)
+                newThr = oldThr << 1; // double threshold
+```
+
+### 2.3.3 红黑树
+
+红黑树的定义
+
+* 根节点黑色
+* 红色节点子节点必须是黑色
+* 根节点到所有null节点路径上的黑色节点数相同
+* 所有null节点都是黑色
+
+> 上面的定义保证了最长路径 <= 最短路径*2, 类平衡二叉树, 时间复杂度logN
+>
+> 红黑树适合插入和删除比较频繁的, AVL适合查询比较频繁的, 总体性能红黑树>AVL
+
+一颗红黑树示例
+
+![1679888099390](image/Java集合和基础/1679888099390.png)
+
+一颗红黑树与一颗4阶B树是等价的
+
+![1679888467448](image/Java集合和基础/1679888467448.png)
+
+红黑树的查询和二叉搜索树查询相同
+
+插入元素时插入的节点默认为红节点, 如果插入的位置父节点也是红节点, 需要旋转并染色, 否则直接插入
+
+删除节点时, 红节点直接删除, 黑色节点情况复杂, 需要染色和旋转
+
+### 2.3.4 LinkedHashMap
+
+底层是散列表+双向链表
+
+![1680027748774](image/Java集合和基础/1680027748774.png)
+
+### 2.3.5 HashTable
+
+是线程安全的HashMap, 使用的同步方法
+
+```java
+public synchronized V put(K key, V value)
+```
+
+HashTable的key, value不能为null
+
+```java
+        Hashtable<String ,Integer> table = new Hashtable<>();
+        table.put(null, null);//NullPointerException
+        table.put("spider", null);//NullPointerException
+        table.put(null, 123);//NullPointerException
+```
+
+### 2.3.6 TreeSet&TreeMap
+
+TreeSet底层使用TreeMap, 可以实现排序, 排序使用Comparator, **如果两个值相等会认为是同一个元素**
+
+**TreeMap底层使用红黑树**
+
+## 2.4 Collections工具类
+
+常用方法如下
+
+```java
+        ArrayList list = new ArrayList(){{add(1); add(2);}};
+        Collections.max(list);
+        Collections.min(list);
+        Collections.reverse(list);
+        Collections.shuffle(list);
+        Collections.sort(list, Comparator.comparingInt(e-> (Integer) e));
+        Collections.frequency(list, 1);
+```
+
+## 2.5 ConcurrentHashMap
+
+jdk8 中的 ConcurrentHashMap 数据结构同 jdk8 中的 HashMap 数据结构一样，都是 **数组+链表+红黑树**
+
+使用了 `CAS` + `Synchronized` 来保证线程安全
+
+```java
+         // 如果计算出来的 tab 下标位置上没有其他元素，用 CAS 操作建立引用
+         else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+             if (casTabAt(tab, i, null,
+                          new Node<K,V>(hash, key, value, null)))
+                 break;                   // no lock when adding to empty bin
+         }
+         // 如果发现当前节点的哈希值是 MOVED，则说明正处于扩容状态中，当前线程加入扩容大军，帮助扩容
+         else if ((fh = f.hash) == MOVED)
+             tab = helpTransfer(tab, f);
+         else {
+             V oldVal = null;
+             // 哈希冲突，锁住当前节点
+             synchronized (f) {
+		//遍历链表或搜索红黑树
+	     }
+```
+
+tansfer
+
+```
+根据 CPU 核心数确定每个线程负责的桶数，默认每个线程16个桶. 创建新数组，长度是原来数组的两倍
+分配好当前线程负责的桶区域 [bound, nextIndex)
+并发迁移，根据链表和红黑树执行不同迁移策略
+```
