@@ -175,7 +175,7 @@ synchronized (MyApplication.class){
 }
 ```
 
-## 1.8 虚假唤醒
+## 1.8 虚假唤醒问题
 
 什么是虚假唤醒?
 
@@ -594,8 +594,6 @@ StoreStore
 StoreLoad
 ```
 
-
-
 ## 4.4 CAS
 
 CAS(Compare and swap)是一种**乐观锁**机制
@@ -603,7 +601,7 @@ CAS(Compare and swap)是一种**乐观锁**机制
 CAS写入时会比较线程的expect期待值(线程读取时的值)和内存中的值是否相等
 
 1. 如果相同说明没有其他线程写过, 将计算后的值写入
-3. 整个CAS比较和写入过程是一个硬件提供的**原子操作**
+2. 整个CAS比较和写入过程是一个硬件提供的**原子操作**
 
 ***JUC中的AtomicXxx类 + AtomicReference `<T>`均使用CAS机制***
 
@@ -750,7 +748,6 @@ ThreadLocalMap的key**使用ThreadLocal弱引用的原因**:
 将AQS作为独占锁时:
 线程获取锁时: cas(state, 0, 1) 如果失败则将线程加入队列并阻塞当前线程
 ```
-
 
 ```
 state表示当前上锁的次数, 为0是

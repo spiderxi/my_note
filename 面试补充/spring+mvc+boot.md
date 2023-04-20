@@ -118,8 +118,8 @@ bean依赖的注入方式
 区别
 
 ```
-@Autowired优先按照ByType方式注入
-@Resource优先按照ByName方式注入
+@Autowired按照ByType方式注入, 当有多个类型符合要求时使用@Qualifier明确beanid
+@Resource("beanid")按照ByName方式注入
 ```
 
 @Qualifier
@@ -127,6 +127,41 @@ bean依赖的注入方式
 ```
 @Qualifier: 显示声明需要注入的beanId
 ```
+
+## 注入详解
+
+Static变量注入
+
+```
+@Value("${key}")+成员setter方法
+```
+
+接口的注入
+
+```
+实质上是注入接口的实现类
+```
+
+抽象类/普通类的注入
+
+```
+注入抽象类的实现类 or 普通类及其子类
+```
+
+List`<A>`的注入
+
+```
+注入所有A类及其子类/实现类
+在list中的顺序按照@Order排序
+```
+
+Map<String, A>的注入
+
+```
+key=beanid, value= A及其子类/实现类
+```
+
+
 
 ## 事务
 
@@ -252,11 +287,9 @@ CGLIB
 
 # SringBoot
 
-
 ## spring-boot-starter-parent
 
 所有的springboot项目都继承自这个项目, **用于依赖项的版本管理**
-
 
 ## 自动配置原理
 

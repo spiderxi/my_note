@@ -79,22 +79,23 @@ this_class, super class, interface是指向常量池的指针
 
 ![1678704937530](image/jvm/1678704937530.png)
 
-Loading
+加载
 
 ```
-通过类的全限定名找到字节流, 将常量池和其他类文件中包含的数据结构放到方法区
-在heap中生成一个Class对象作为访问入口
+通过类的全限定名找到二进制字节流
+将类的静态数据结构放到方法区
+生成一个Class对象作为访问入口
 ```
 
-Link
+验证 准备 解析
 
 ```
-验证: 验证类文件格式符合要求, 数据流不会危害到JVM自身安全....
+验证: 验证字节流文件是否安全/格式是否正确(如数组的越界访问)
 准备: 为static变量申请存储空间并设为0
 静态解析: 将常量池中的符号引用变为直接引用
 ```
 
-initialization
+初始化
 
 ```
 执行<cinit>方法, 给static变量赋值&执行static代码块
@@ -102,7 +103,7 @@ initialization
 !!! <cinit>函数在多线程下执行会被加锁
 ```
 
-初始化的时机为一个类被主动引用, 主动引用大致分为
+**初始化的时机为一个类被主动引用,** 主动引用大致分为
 
 ```
 new对象 读写静态变量 调用静态方法时
@@ -134,7 +135,7 @@ Application Class Loader(继承ClassLoader): ClassLoader.getSystemClassLoader()�
 
 ![1678708801020](image/jvm/1678708801020.png)
 
-下一级类加载器采用组合的方式包含上一级类加载器, 当下级loadClass()时会委托给上级loadClass(), 上级无法加载时再自己完成findClass(), 双亲委派机制保障了Java 标准库的安全
+下一级类加载器采用组合的方式包含上一级类加载器, 当下级loadClass()时会委托给上级loadClass(), 上级无法加载时再自己完成findClass(), **双亲委派机制保障了Java 标准库的安全**
 
 破坏双亲委派机制
 
@@ -173,8 +174,6 @@ Jvm把运行时数据区(Runtime data area)分为不同的区域用于不同用�
 1. 如果当线程的栈扩容时没有足够存储空间时, 会报OutOfMemory异常
 2. 如果一个线程扩容后的栈大小大于虚拟机所允许的最大值, 会报StackOverflow异常(-Xss设置最大值)
 ```
-
-> Native Method Stacks和虚拟机栈相似, 但用于本地方法
 
 ### 2.1.3 堆
 
@@ -216,18 +215,53 @@ JDK8后方法区使用直接内存
 
 JD8以后方法区变化:
 
-常量池中的字符串放了到堆空间的StringTable中, 便于垃圾回收, 静态引用变量指向的对象也放到了heap中
+常量池中的字符串放了到堆空间的字符串常量池中, 便于垃圾回收, 静态引用变量指向的对象也放到了heap中
 
 ```java
 static int i = 1; //the value 1 is stored in the metaspace
 static Object o = new SomeObject(); //the reference(pointer/memory address) is stored in the metaspace, the object itself is not.
 ```
 
-## 2.1.* 直接内存
+### 2.1.5 常见参数和异常
+
+-Xss
+
+```
+虚拟机栈的最大大小, 超过报StackOverFlow异常
+
+如果栈大小没有超过栈的最大大小但没有额外内存分配报OOM
+```
+
+-Xmx -Xms
+
+```
+-Xmx 堆最大大小
+-Xms 堆最小大小
+超过堆最大大小时报OOM
+```
+
+### 2.1.6 OOM/SOF排查
+
+stackoverflow排查
+
+```
+基本上就是死循环 or 无线递归调用 导致的问题
+```
+
+outofmemory: heap space
+
+```
+使用jvm选项-XX:+HeapDumpOnOutOfMemoryError, 将发生OOM时的内存快照dump下来
+使用专门的工具分析是内存不足还是内存泄漏
+```
+
+
+
+### 2.1.7 直接内存
 
 直接内存是JVM向操作系统申请的内存空间, 读写速度更heap快
 
-JDK8后方法区和的metaspace和NIO direct buffer都使用直接内存
+**JDK8后方法区和的方法区和NIO direct buffer都使用直接内存**
 
 ## 2.2 普通对象的new过程
 
@@ -244,7 +278,7 @@ JDK8后方法区和的metaspace和NIO direct buffer都使用直接内存
 
 一个OO的存储空间被划分为: Header(markword+classPointer) + Instance Data +Padding
 
-header(8+8字节)
+header(8Byte Markword+8Byte ClassPointer)
 
 markword(8Byte)
 
@@ -256,8 +290,6 @@ Instance Data
 
 ```
 由从父类继承的字段和自己类型的字段组成
--XX：FieldsAllocationStyle 设置如何安排字段顺序(默认父类变量在前)
-+XX：CompactFields 设置子类之中较窄的变量是否允许插入父类变量的空隙
 ```
 
 Padding
@@ -338,7 +370,7 @@ YGC时Survivor区的处理
 
 > 垃圾回收时用户线程会阻塞! 避免频繁的FGC!
 
-## 3.3 垃圾判别算法
+## 3.3 垃圾标记算法
 
 * 引用计数
 
@@ -360,15 +392,14 @@ String s2 = s1//引用次数+=1
 
 ![1678889482822](image/jvm/1678889482822.png)
 
-从GC Root Set中的对象开始查找, 对于顺着引用链条没有找到该对象, 则该对象是垃圾
+从GC Roots对象开始查找, 对于顺着引用链条没有找到该对象, 则该对象是垃圾
 
-GC Root Set常见的对象是
+GC Root 常见的对象是
 
 ```
-VM Stack栈中的局部变量表引用的对象
-方法区中静态属性引用的对象
-synchronized持有的对象
-虚拟机内部维持运行的对象(如基本类型的Class对象, 常驻异常对象, 系统类加载器对象)
+1. 局部变量
+2. static变量
+3. JVM内部常驻对象, 如NullPointerException、OutOfMemoryError、ClassLoader
 ```
 
 ## 3.4 finalize() & System.gc()
@@ -387,13 +418,13 @@ System.gc()
 
 ## 3.5 垃圾清理算法
 
-* Mark-Sweep
+* 标记清除
 
 ![1678890786471](image/jvm/1678890786471.png)
 
 先顺着根节点查找标记不是垃圾的对象, 再顺序遍历把垃圾的空间放到空闲空间列表中
 
-* Coping
+* 复制算法
 
 将内存分为两份, 每次只使用一份, 只需要顺着根节点查找, 不需要顺序遍历
 
@@ -401,7 +432,7 @@ System.gc()
 
 ![1678890974879](image/jvm/1678890974879.png)
 
-* Mark-Compact
+* 标记压缩
 
 ![1678891314949](image/jvm/1678891314949.png)
 
@@ -411,56 +442,69 @@ System.gc()
 
 ```
 -XX: +PrintGC //显示垃圾回收日志信息
+-XX: UsebalabalaGC //明确使用某种gc
 ```
 
 GC的性能指标
 
-1. 吞吐量 = 代码执行时间/(代码执行实践+垃圾回收时间)
+1. 吞吐量 = 垃圾回收的时间占比
 2. 暂停时间 = 一次GC中STW时间
 
 ![1678910959617](image/jvm/1678910959617.png)
 
-经典GC及其分类
 
-![1678911272267](image/jvm/1678911272267.png)
+### 3.6.1 其他GC
 
-### 3.6.1 Serial (Old) GC
+Serial  GC
 
-![1678911683418](image/jvm/1678911683418.png)采用单线程回收垃圾 ; 会有STW ; 新生代采用coping算法, 老年代使用mark-compact算法
+![1678911683418](image/jvm/1678911683418.png)采用单线程回收垃圾 ; 会有STW, **适合配置低(比如核心数=1)的机器**
 
-> 适合配置较低的单核处理器的客户端
+---
 
-### 3.6.2 ParNew GC
+ParNew GC
 
 ![1678911968016](image/jvm/1678911968016.png)
 
-Serial GC的多线程版本 ; 常与CMS配合使用
-
-### 3.6.3 Parallel (Old) GC
-
-Parallel Scavenge GC **吞吐量优先**的GC, 与ParNew一样多线程, 性能和ParNew也差不多
-
-> 不适合与用户交互的场景, 适合后台计算.
-
-JDK8默认GC: Parallel + Parallel Old
+在Serial GC的基础上使用多个gc线程
 
 ### 3.6.4 CMS
 
 ![1678912962881](image/jvm/1678912962881.png)
 
-初始标记仅仅只是标记一下GCRoots能直接关联到的对象，速度很快；
+4个阶段
 
-并发标记阶段就是从GC Roots的直接关联对象开始遍历整个对象图的过程，这个过程耗时较长但是不需要停顿用户线程，可以与垃圾收集线程一起并发运行；
+```
+初始标记(STW) -> 并发标记 -> 重新标记 -> 并发清除(标记清除算法)
+```
 
-重新标记阶段则是为了修正并发标记期间，因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录
+优点
 
-> 适合交互频繁, 低延迟的场景, 但会产生内存碎片
+```
+STW时间短, 程序响应速度快
+```
+
+缺点
+
+```
+使用标记清除算法会导致内存碎片
+并发清理阶段新产生的新垃圾无法回收(浮动垃圾)
+```
+
 
 ### 3.6.5 G1
 
-将内存分成2048各个区域
+将内存分成多个小区域, 分为eden, servivor, old区
 
 ![1678952428695](image/jvm/1678952428695.png)
+
+**垃圾清除使用复制算法**
+
+G1优点
+
+```
+由于单次进行垃圾回收的粒度更小了, 可以设置单次STW的最大时间
+```
+
 
 ## 3.7 四种Reference类型
 
@@ -483,7 +527,7 @@ Object obj = softObj.get();//获得对象的强引用, 当内存不足导致对�
 Weak Reference
 
 ```
-//被弱引用的对象在GC时会被回收, 但由于内存资源充足时两次GC间隔长, 弱引用对象可以存活较长时间
+//被弱引用的对象在GC时会被回收不论内存是否足够(CMS gc在内存使用率80%就gc)
 //实践: 弱引用缓存对象 
 WeakReference<Object> weakObj = new WeakReference<>(new Object());//声明一个弱引用
 //扩展: WeakHashMap是Entry为弱引用的Hashmap
@@ -496,13 +540,12 @@ queue = new ReferenceQueue<>();//声明一个引用队列
 PhantomReference<Object> phantomRef = new PhantomReference<Object>(new Object(), queue);
 Object o = phantomRef.get();//o==null, 不能通过幽灵引用获取对象
 //当对象被虚引用时相当于没有被引用, 可达性算法会忽略虚引用
-//设置虚引用的目的是当对象被回收时(真正意义上的回收, finalize可能会导致对象复活), 会将一个ref对象放
-//到引用队列中通知应用程序
+//设置虚引用的目的是当对象被回收时(真正意义上的回收, finalize可能会导致对象复活), 会将一个ref对象放到引用队列中通知应用程序, 用于实现对象被回收后的后续处理
 ```
 
 # 4. 执行引擎&本地方法&String
 
-## 4.1 本地方法
+## 4.1 native方法
 
 本地方法是使用native关键字的方法, 具体实现一般使用c/c++
 
@@ -515,7 +558,6 @@ public  class IHaveNatives {
 }
 ```
 
-使用本地方法可以实现与操作系统交互, 本地方法适合于: 用Java实现起来不容易，或者是我们对执行效率很在意的函数
 
 ## 4.2 执行引擎结构
 
@@ -531,18 +573,9 @@ JIT 对于热点方法(通过执行次数统计得出)直接把方法翻译成�
 
 > JVM启动时, 主要是解释器在翻译字节码并执行, 此时执行效率低, 当执行时间长后, JIT优化可以提高执行效率 (热机性能高于冷机)
 
-参数设置
+## 4.3 String的存储方式
 
-```
--Xinit 完全使用解释器执行
--client JIT编译对字节码只做简单优化再编译
--server JIT不管编译时长, 尽可能优化字节码再编译(额外进行逃逸分析, 常量折叠)
-
-```
-
-## 4.3 String在存储方式
-
-JDK9+ 后String在内存中的存储
+JDK9+ 后String的存储方式
 
 ```
 1. JDK8 字符串的值 private final char value[] 是一个UTF-16的字符数组; JDK9后使用byte[]数组并存储编码类型Asicc/utf-8/utf-16/utf-32
@@ -564,19 +597,17 @@ String s4 = s1 + "b"; //如果相加的字符串不是字面值, 使用StringBui
 //添加final的String类型在编译后视为字符串字面值
 ```
 
-**补充: Java方法****参数为基本类型是传递的值是一个副本, 参数是引用类型时传递的值是指针的副本**
+***补充: Java方法参数为基本类型是传递的值是一个副本, 参数是引用类型时传递的值是指针的副本***
 
 **!!!数组属于引用类型**
 
-## 4.4 字符串常量池
+## 4.4 字符串常量池StringTable
 
-位于堆中的StringTable用于存储字符串字面值及其相加的结果, 本质是一个HashTable
+heap中的StringTable本质是一个HashTable
 
-```
--XX: StringTableSize //设置hashtable长度
-```
 
-JDK7+中的intern()函数作用
+
+**JDK7+中的intern()函数作用**
 
 查找字符串对象的值是否在常量池中, 如果在, 返回指向常量池中该值的指针
 

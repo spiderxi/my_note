@@ -421,6 +421,7 @@ grep(查找符合RE的行)
 sort(按行进行排序) 
 uniq(去除重复的行)
 cut(对每一行按分隔符切割后取出分割后的内容)
+awk
 ```
 
 $() 让指令输出作为**占位符**的内容
@@ -435,6 +436,7 @@ echo "当前linux内核版本为: $(uname -r)"
 echo "shit" > /dev/null
 
 ```
+
 
 ## 4.7 指令编程
 
@@ -830,7 +832,7 @@ yum remove Xxx
 yum list installed
 ```
 
-dpkg(数据库文件为`/etc/apt/sources.list`)
+dpkg(数据库文件为 `/etc/apt/sources.list`)
 
 ```
 apt-get install Xxx
