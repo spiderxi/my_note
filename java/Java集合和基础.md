@@ -375,8 +375,6 @@ ServiceLoader的代码
         });
 ```
 
-
-
 ## 1.10 基本类型
 
 常用基本类型
@@ -408,7 +406,7 @@ byte -> short -> int -> long -> float -> double
         short s2 = s1 + 1;//编译报错
 ```
 
-强制转型
+强制转型(向下转型)
 
 ```java
 int i = (int) 123.3d;
@@ -421,6 +419,48 @@ int i = (int) 123.3d;
         System.out.println(i == k);//false
         System.out.println(j == k);//true, Integer.IntegerCache
 ```
+
+## 1.11 序列化
+
+什么是序列化和反序列化?
+
+```
+序列化是指将Java对象变成字节流用于传输, 反序列化相反
+```
+
+JavaJDK的序列化方式
+
+```
+实现Serializable接口的类可以进行序列化, 序列化的对象的引用属性必须也能序列化
+
+通过ObjectInputStream/OutputStream可以实现序列化对象为io流
+```
+
+transient
+
+```
+transient属性不会被序列化, 密码等属性要使用transient
+```
+
+serialVersionUID
+
+```
+private static final long serialVersionUID = 1L;
+如果对象的序列化版本号和类的序列化版本号对不上会导致反序列化失败
+所以需要显示指明序列化版本号避免hash函数生成
+```
+
+## 1.12 接口和抽象类
+
+两者区别
+
+```
+1. 接口和抽象类不能实例化
+2. 接口所有方法都为抽象的public方法, 不能有成员属性, 可以有static属性
+3. 抽象类方法的修饰符没有限制, 但可以包含抽象方法
+```
+
+
 
 # 2. Java集合
 
@@ -455,7 +495,7 @@ Java集合的体系
   ```
 * ArrayLsit线程不安全, Vector线程安全
 
-默认数组长度==0,  第一次add()时会设置数组长度为10
+默认数组长度为0,  第一次add()后初始长度为10
 
 ```java
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
@@ -463,7 +503,7 @@ Java集合的体系
         }
 ```
 
-**数组空间不足时扩容到1.5倍**, 扩容后超出最大容量需要额外处理
+**数组空间不足时扩容到1.5倍**, copy原数据到新数组中
 
 ```java
 int newCapacity = oldCapacity + (oldCapacity >> 1);
@@ -471,7 +511,7 @@ int newCapacity = oldCapacity + (oldCapacity >> 1);
 
 ### 2.2.2 Vector
 
-Vector底层也是使用Object数组, 默认大小==10, **容量不足时扩容capacityIncrement(默认扩容两倍)**
+Vector和ArrayList很相似, 底层也是使用Object数组, 默认大小==10, **容量不足时扩容默认扩容两倍(可以设置具体扩容多少)**
 
 ```java
         int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
@@ -490,6 +530,8 @@ Vector底层也是使用Object数组, 默认大小==10, **容量不足时扩容c
 
 ### 2.2.3 LinkedList
 
+*底层是一个双端链表(维护头节点和尾节点)*
+
 移除列表中的节点时, 需要将pre, item, next指针置空防止内存泄漏
 
 原因: 节点虽然从LinkedList中删除, 但是如果可以通过其他方式可达该节点, 那么这个节点的next, item, pre也可达, 可能导致gc不能识别出垃圾
@@ -503,7 +545,7 @@ Vector底层也是使用Object数组, 默认大小==10, **容量不足时扩容c
 
 ### 2.3.1 HashSet
 
-HashSet底层使用HashMap, key=元素, value=同一个占位Object
+HashSet底层使用HashMap, HashMap中的所有键值对***value是同一个占位Object***
 
 ```java
 //HashSet的add()
@@ -514,9 +556,9 @@ public boolean add(E e) {
 
 ### 2.3.2 HashMap
 
-HashMap底层是**散列表+红黑树**
+HashMap底层是**散列表+红黑树**, 默认capacity是16
 
-根据Hash值后(n-1)位获取散列表索引, 索引位置没有链表时, 直接插入
+HashMap的长度为2^n的目的是便于求模(length-1再&hash)
 
 ```java
         if ((p = tab[i = (n - 1) & hash]) == null)
@@ -531,7 +573,7 @@ HashMap底层是**散列表+红黑树**
                 e = p;
 ```
 
-到链表末尾时, 插入节点并检查查找长度是否超过树化阈值且散列表长度是否>=64, 超过则将链表转为红黑树
+到链表末尾时, 插入节点并检查查找长度是否超过树化阈值, 超过则将链表转为红黑树
 
 ```java
                     if ((e = p.next) == null) {
@@ -542,19 +584,17 @@ HashMap底层是**散列表+红黑树**
                     }
 ```
 
-如果总的节点数超过阈值, 扩容散列表
+如果总节点数超过阈值(capacity * load factor), 扩容
 
 ```java
         if (++size > threshold)
             resize();
 ```
 
-扩容逻辑: 散列表长度 ×= 2, 总节点数阈值 ×= 2, **初始总节点数阈值 = 初始散列表长度(16) * 3/4**
+扩容逻辑: capacity *= 2
 
 ```java
-            else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
-                     oldCap >= DEFAULT_INITIAL_CAPACITY)
-                newThr = oldThr << 1; // double threshold
+newCap = oldCap << 1
 ```
 
 ### 2.3.3 红黑树
@@ -562,8 +602,8 @@ HashMap底层是**散列表+红黑树**
 红黑树的定义
 
 * 根节点黑色
-* 红色节点子节点必须是黑色
-* 根节点到所有null节点路径上的黑色节点数相同
+* **红色节点子节点必须是黑色**
+* **根节点到所有null节点路径上的黑色节点数相同**
 * 所有null节点都是黑色
 
 > 上面的定义保证了最长路径 <= 最短路径*2, 类平衡二叉树, 时间复杂度logN
@@ -574,13 +614,11 @@ HashMap底层是**散列表+红黑树**
 
 ![1679888099390](image/Java集合和基础/1679888099390.png)
 
-一颗红黑树与一颗4阶B树是等价的
+**一颗红黑树与一颗4阶B树是等价的**
 
 ![1679888467448](image/Java集合和基础/1679888467448.png)
 
-红黑树的查询和二叉搜索树查询相同
-
-插入元素时插入的节点默认为红节点, 如果插入的位置父节点也是红节点, 需要旋转并染色, 否则直接插入
+**插入元素时插入的节点默认为红节点**, 如果插入的位置父节点也是红节点, 需要旋转并染色, 否则直接插入
 
 删除节点时, 红节点直接删除, 黑色节点情况复杂, 需要染色和旋转
 
@@ -609,52 +647,41 @@ HashTable的key, value不能为null
 
 ### 2.3.6 TreeSet&TreeMap
 
-TreeSet底层使用TreeMap, 可以实现排序, 排序使用Comparator, **如果两个值相等会认为是同一个元素**
+TreeSet底层使用TreeMap, 可以实现排序, 排序使用Comparator, 如果两个值相等会认为是同一个元素
 
-**TreeMap底层使用红黑树**
+**TreeMap底层使用红黑树,** 比较大小可以使用comparator/自然排序, 复杂度logN
 
-## 2.4 Collections工具类
 
-常用方法如下
+### 2.3.7 Hash冲突解决方法
 
-```java
-        ArrayList list = new ArrayList(){{add(1); add(2);}};
-        Collections.max(list);
-        Collections.min(list);
-        Collections.reverse(list);
-        Collections.shuffle(list);
-        Collections.sort(list, Comparator.comparingInt(e-> (Integer) e));
-        Collections.frequency(list, 1);
 ```
+1. 在hash冲突的位置往周围探测, 找到一个空闲的桶放置
+2. 发生hash冲突时, 通过另一个hash函数映射到其他桶
+3. 冲突的位置使用链表
+4. 将冲突的元素放到公共的溢出表
+```
+
 
 ## 2.5 ConcurrentHashMap
 
-jdk8 中的 ConcurrentHashMap 数据结构同 jdk8 中的 HashMap 数据结构一样，都是 **数组+链表+红黑树**
+ConcurrentHashMap 底层结构和HashMap相同
 
-使用了 `CAS` + `Synchronized` 来保证线程安全
+使用了 `CAS` + `Synchronized` 来保证线程安全, **桶空时使用CAS, hash冲突时还是会synchronized**加锁
 
 ```java
-         // 如果计算出来的 tab 下标位置上没有其他元素，用 CAS 操作建立引用
+         // 如果桶的位置没有元素, 使用Unsafe中CAS方法放入一个元素
          else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
              if (casTabAt(tab, i, null,
                           new Node<K,V>(hash, key, value, null)))
-                 break;                   // no lock when adding to empty bin
+                 break;                   // 如果成功退出循环, 否则自旋
          }
-         // 如果发现当前节点的哈希值是 MOVED，则说明正处于扩容状态中，当前线程加入扩容大军，帮助扩容
+         // 如果发现当前节点的哈希值是 MOVED，则说明正处于扩容状态中，当前线程帮助扩容
          else if ((fh = f.hash) == MOVED)
              tab = helpTransfer(tab, f);
          else {
              V oldVal = null;
-             // 哈希冲突，锁住当前节点
+             // 锁住头节点节点
              synchronized (f) {
-		//遍历链表或搜索红黑树
+		//遍历链表/红黑树插入节点
 	     }
-```
-
-tansfer
-
-```
-根据 CPU 核心数确定每个线程负责的桶数，默认每个线程16个桶. 创建新数组，长度是原来数组的两倍
-分配好当前线程负责的桶区域 [bound, nextIndex)
-并发迁移，根据链表和红黑树执行不同迁移策略
 ```
