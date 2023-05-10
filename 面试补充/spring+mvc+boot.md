@@ -86,17 +86,10 @@ Factorybean是什么?
 bean生命周期
 
 ```
-1. newInstance
-2. setter注入属性
-3. setBeanName()
-4. setBeanFactory()
-5. setApplicationContext()
-6. 预初始化
-7. 初始化
-8. postProcessAfterInitialization
-9. 可以被正常使用
-10. PreDestroy
+实例化对象 -> 属性赋值 -> 初始化 -> 使用 -> 销毁
 ```
+
+![1683257818780](image/spring+mvc+boot/1683257818780.png)
 
 bean的作用域
 
@@ -148,7 +141,7 @@ Static变量注入
 注入抽象类的实现类 or 普通类及其子类
 ```
 
-List`<A>`的注入
+List `<A>`的注入
 
 ```
 注入所有A类及其子类/实现类
@@ -161,8 +154,6 @@ Map<String, A>的注入
 key=beanid, value= A及其子类/实现类
 ```
 
-
-
 ## 事务
 
 Spring提供声明式事务管理, **底层实现原理是AOP**, 对方法执行前开启事务和执行后检查是回滚还是提交
@@ -173,6 +164,15 @@ Spring提供声明式事务管理, **底层实现原理是AOP**, 对方法执行
 ```
 
 事务隔离级别和mysql中的一致
+
+**事务失效场景**
+
+```
+* 不是public方法
+* final修饰方法
+* 方法内部捕获了异常/异常类型不是@Transactional(rollbackFor = ...)
+* 成员方法调用事务方法
+```
 
 ## 线程安全问题
 
@@ -189,9 +189,12 @@ ioc容器中如果单例bean被多个线程写入状态可能出现线程安全�
 三级缓存
 
 ```
-一级缓存存放初始化好了的bean,
-三级缓存存放刚实例化的bean
+一级缓存存放已经初始化完成的单例对象，
+二级缓存存放半成品对象(已经实例化，但是还没有填充属性)
+三级缓存存放对象工厂
 ```
+
+*使用二级缓存就可以解决循环依赖, 使用三级缓存的目的是解决AOP问题*
 
 # AOP
 

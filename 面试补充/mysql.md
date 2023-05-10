@@ -284,7 +284,6 @@ MVCC可以实现读写并行
 版本链
 ```
 
-
 # 日志
 
 ## redo log
@@ -302,12 +301,8 @@ redo log 是一个物理日志, 记录了数据页变化前的数据和变化后
 redo log适用append方式写入快
 ```
 
-
-## undo log 
+## undo log
 
 undo log 是一个逻辑日志, 记录了更新Sql的逆向Sql, 保证事务的原子性, 实现MVCC
 
-
 ## bin log
-
-bin log 是一个逻辑日志, 记录更新sql, 用于主从同步, 在事务提交后会写入bin log

@@ -1,0 +1,23 @@
+VScode KeyMap PLUS版
+--------------------------
+必要快捷键
+--------------------------
+ctrl+j     |  Left
+ctrl+k     |  Right
+ctrl+i     |  Up
+ctrl+m     |  Down
+ctrl+;     |  Move caret To line end
+ctrl+f     |  find
+ctrl+r     |  replace
+ctrl+c     |  copy
+ctrl+s     |  save
+ctrl+x     |  cut
+ctrl+v     |  paste
+ctrl+d     |  send EOF
+ctrl+点击  |  查看定义
+alt+↓/↑    |  整行向下/上移动
+alt+shift+↓|  整行向下复制
+alt+h      |  type hierarchy
+alt+s      |  reformat file
+alt+←/→    |  返回上/下一个浏览位置
+-------------------------

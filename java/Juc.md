@@ -35,6 +35,13 @@ Java如何解决这三个问题的?
 TLB在CPU中只有一个, 切换进程后所有TLB缓存失效, 新的程序访问一个地址会重新从内存中读取页表, 如果不切换进程TLB命中率很高!!!
 ```
 
+**多线程使用场景**
+
+```
+Web服务器: 多线程, 每个线程负责一个客户端连接
+后台任务: 后台定时备份
+```
+
 ## 1.2 线程创建方式
 
 * 直接重写Thread及其子类的run()
@@ -140,6 +147,15 @@ synchronized也可以修饰静态方法, 成员方法
     }
 //成员方法的锁为this指向的对象
 ```
+
+**synchronized原理**
+
+```
+synchronized使用的时管程机制, 每个对象的对象头中mark word会有一个指针, 指向与这个对象相关联的ObjectMonitor, 这个ObjectMonitor包含一个计数器, 一个阻塞线程队列, 一个wait线程队列, 以及当前拥有者线程
+进入同步代码块时, 会执行一个monitorenter的指令, 将计数器+1, 退出同步代码块时会将计数器-1
+```
+
+![1683366807690](image/Juc/1683366807690.png)
 
 ## 1.6 死锁问题
 
@@ -321,7 +337,7 @@ Lock lock = new ReentrantLock(isFair);
 Executors.newXxx();
 ```
 
-使用ThreadPoolExecutor构造函数创建
+**使用ThreadPoolExecutor构造函数创建**
 
 ```
     public ThreadPoolExecutor(int corePoolSize, //最小线程个数
@@ -344,6 +360,20 @@ Executors.newXxx();
                 return 1;
             }
         }));
+```
+
+**线程池主要参数配置**
+
+```
+CPU密集型：corePoolSize = CPU核数 + 1
+IO密集型：corePoolSize = CPU核数 * 2
+```
+
+**线程池关闭**
+
+```
+shutdown() 方法后线程池会在执行完正在执行的任务和队列中等待的任务后才彻底关闭
+shutdownNow() 方法之后，首先会给所有线程池中的线程发送 interrupt 中断信号，尝试中断这些任务的执行，然后会将任务队列中正在等待的所有任务转移到一个 List 中并返回
 ```
 
 ## 2. 9 异步回调
@@ -579,13 +609,13 @@ JMM(Java memory model)是对操作系统/硬件内存的抽象, 用于屏蔽具�
 
 ## 4.4 内存屏障
 
-CPU为了实现缓存一致性, 需要遵守缓存一致性协议, 当使用缓存一致性协议(入MESI协议)之后, CPU对cache的写都会先写入store buffer, 等待其他核心的cache 加入无效队列后并返回ack才正式写入
+CPU为了实现缓存一致性, 需要遵守缓存一致性协议, 当使用缓存一致性协议(如MESI协议)之后, CPU对cache的写都会先写入store buffer, 等待其他核心的cache 加入无效队列后并返回ack才正式写入
 
-所以读写操作都会有延迟, 可能导致指令重排序
+所以**读写操作都会有延迟**,  需要内存屏障保证读写操作完成
 
 ![1681539700525](image/Juc/1681539700525.png)
 
-使用内存屏障指令可以强制限定指令之前的读操作/写操作在什么时候必须完成, 由于不同硬件的内存屏障指令不同, 所以JDK对内存屏障指令做了抽象, 分为4中
+使用内存屏障指令可以强制限定指令之前的读操作/写操作在什么时候必须完成, 由于不同硬件的内存屏障指令不同, 所以J**DK对内存屏障指令做了抽象**, 分为4种
 
 ```
 LoadLoad :  屏障之前的读必须在屏障之后的下一次读之前完成
@@ -684,9 +714,9 @@ ThreadLocal对象在不同线程get时返回的值不同(每个线程单独一�
 //t2: 9
 ```
 
-原理: Thread对象维护一个ThreadLocalMap对象, map的key = ThreadLocal的弱引用, value = Thread对象的ThreadLocal值
+原理: Thread对象维护一个**ThreadLocalMap**对象, **这个对象和HashMap类似**, map的key = ThreadLocal的弱引用, value = 该线程的副本
 
-get()时使用Thread.localThread获取值
+**get()时先获取当前线程, 然后找到当前线程的ThreadLocalMap, 通过key获取副本**
 
 ThreadLocalMap的key**使用ThreadLocal弱引用的原因**:
 

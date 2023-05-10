@@ -12,12 +12,6 @@
 
 ![1681289687746](image/redis/1681289687746.png)
 
-缓存穿透
-
-```
-频繁查询不存在的数据, 每次都经过redis缓存和数据库, 导致数据库承受不住
-解决方法: redis缓存空值(设置较短过期时间)/bloom filter 
-```
 
 bloom filter原理
 
@@ -25,19 +19,7 @@ bloom filter原理
 通过多个hash函数映射到bitmap的不同位置为1, 查询时如果有一个位置不是1则肯定不存在
 ```
 
-缓存击穿
 
-```
-热点数据失效瞬间遇到大量请求, 请求转移到数据库
-解决方法: 热点数据不过期/定时更新过期时间, 设置互斥锁 
-```
-
-缓存雪崩
-
-```
-大量热点缓存在短时间同时失效, 导致请求堆积到数据库
-解决方法: 将热点数据的过期时间错开
-```
 
 ## 缓存和数据库一致性问题
 
@@ -66,84 +48,6 @@ redis如何保证高并发下不会出错
 1. redis单线程, 且incr, decr等api是原子的
 2. 可以使用分布式锁保障并发原子性
 ```
-
-# Redis基础
-
-## 类型和常用命令
-
-查看符合模式的key
-
-```
-keys <pattern>
-```
-
-string类型命令
-
-```
-set <key> <value> <sec>
-get <key> <value>
-mset <key1> <value1> <key2> <value2>
-mget <key1> <key2>
-del <key>
-expire <key> <sec>
-persist <key>
-```
-
-五大基本类型: string list hash set zset(有序的set)
-
-其他类型: geospitial, hyperloglog(统计uv, 底层算法是伯努利实验+概率估计), bitmap
-
-
-## SDS
-
-redis自定义的一个字符串数据结构
-
-```
-struct sdshdr{
-     //记录buf数组中已使用字节的数量
-     //等于 SDS 保存字符串的长度
-     int len;
-     //记录 buf 数组中未使用字节的数量
-     int free;
-     //字节数组，用于保存字符串
-     char buf[];
-}
-```
-
-可以o(1)获取字符串长度, 避免频繁的重新分配内存空间
-
-## list, hash, zset实现
-
-```
-1. list:使用双端链表实现
-2. hash: hash表可以扩容和缩容, 扩容和缩容时会创建一个新的hash表, 使用渐进式rehash, 可能同时维护两个hash表(put操作放到新hash表中, get查询两个hash表)
-3. zset使用skiplist实现, 查询和增删更的复杂度均为logN, 且适合范围查询
-```
-
-# 数据存储
-
-## 过期策略
-
-常见的过期策略
-
-```
-1. 惰性删除: 只有读取数据时发现数据过期, 才删除数据
-2. 定时删除: 每个一顿时间检查定时释放key的集合, 删除过期数据保障集合中过期数据稀疏
-```
-
-
-## 持久化
-
-redis使用AOF/RDB进行缓存持久化
-
-```
-RDB:全量复制, 保存数据库快照
-AOF: 增量复制, 将每个写命令/更新命令写入aof文件中
-```
-
-## Pipeline
-
-pipeline是redis客户端和服务器之间的缓冲, pipeline等客户端发送的命令积累到一定数量后才会发送给服务器执行
 
 # Redis集群
 

@@ -137,15 +137,18 @@ Java中的注解分为7个元注解(Java语言自带的注解)和程序员自定
 
 元注解各自的作用如下
 
-| 注解名               | 作用                         |
-| -------------------- | ---------------------------- |
-| @Override            | 告诉编译器这个方法是重写的   |
-| @Deprecated          | 告诉编译器这个内容是过时的   |
-| @SuppressWarnings    | 告诉编译器忽略Warning        |
-| **@Retention** | 声明自定义注解的有效范围     |
-| @Documented          | 声明自定义注解是否加入文档   |
-| **@Target**    | 声明自定义注解的使用范围     |
-| **@Inherited** | 声明自定义注解的是否有继承性 |
+| 注解名               | 作用                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| @Override            | 告诉编译器这个方法是重写的                                                                                   |
+| @Deprecated          | 告诉编译器这个内容是过时的                                                                                   |
+| @SuppressWarnings    | 告诉编译器忽略Warning                                                                                        |
+| **@Retention** | 声明自定义注解的有效范围<br />RetentionPolicy.SOURCE<br />RetentionPolicy.CLASS<br />RetentionPolicy.RUNTIME |
+| @Documented          | 声明自定义注解是否加入文档                                                                                   |
+| **@Target**    | 声明自定义注解的使用范围<br />ElementType.FIELD<br />ElementType.METHOD<br />ElementType.TYPE                |
+| **@Inherited** | 声明自定义注解的是否有继承性                                                                                 |
+
+
+
 
 * 自定义的注解
 
@@ -181,9 +184,26 @@ Annotation Processing Tool，简称APT，是Java提供给开发者的用于在�
 
 > 通过继承AbstractProcessor实现自定义编译期生效注释处理器
 
+## 1. 4 Switch
+
+基本类型(**除long double float外**)和String, Enum都可以用在switch语句上
+
+```java
+        String s = "123";
+        switch (s) {
+            case "":
+                System.out.println(1);
+                break;
+            case "123":
+                System.out.println(2);
+        }
+```
+
 ## 1.5 异常处理
 
-* java异常接口为Throwable, 实现类为Error(程序无法处理的问题)和Exception(程序可以显式处理的问题)
+* java异常接口为Throwable, 实现类为**Error(程序无法处理的异常)和Exception(程序可以处理的异常)**
+
+  ![1683297526407](image/Java基础/1683297526407.png)
 * 异常处理代码
 
 ```java
@@ -213,9 +233,28 @@ try {
 new Exception().printStackTrace();
 ```
 
-## 1. 6 Math&String
+* CheckedException和UncheckedException
+
+```
+CheckedException: 不捕获就不能通过编译的异常(ClassNotFindException, IOException)
+UncheckedException: 不捕获也可以通过编译的异常(RuntimeException)
+```
+
+* try-with-resource
 
 ```java
+        try(Scanner scanner = new Scanner(System.in)) {
+            int i = scanner.nextInt();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+```
+
+## 1. 6 Math&String
+
+String
+
+```
 //格式化字符串
 String.format("dp[%d][%d] = %d", j, K, minMaxPart)
 //string byte[]互相转化
@@ -223,6 +262,27 @@ byte[] b = "hello, world!".getBytes();
 System.out.println(new String(b));
 //String重写了equals(), 可以比较两个字符串逻辑是否相等
 "??".equals("??");
+
+//字符串编码转换
+String s = "你好";
+String ss = new String(s.getBytes("gbk"), "utf8")
+
+```
+
+String对象为甚么不可变?
+
+```
+String类没有提供像StringBuilder中的replace, append的修改api, 而且value属性是private的
+
+当String相加时, 实质上是新建了一个StringBuilder对象进行append, 最终返回一个新的String对象
+
+要想可变, 使用反射修改value
+```
+
+Math
+
+```java
+
        	//1. 常量
         //自然对数e
         double e = Math.E;
@@ -389,7 +449,7 @@ byte char(注意JAVA中char类型为2字节, 使用unicode编码, char不存在�
 byte -> short -> int -> long -> float -> double
 ```
 
-低等级可以赋值给高等级(高等级不可以赋值给低等级)
+**低等级可以赋值给高等级(高等级不可以赋值给低等级)**
 
 ```java
         int i = 'a';
@@ -398,12 +458,20 @@ byte -> short -> int -> long -> float -> double
         int j = 12d;//编译报错
 ```
 
-低等级和高等级运算结果为高等级(+=, -=运算符会强制转型)
+**低等级和高等级运算结果为高等级(+=, -=运算符会强制转型)**
 
 ```java
         short s1 = 1;
         s1 += 1;
         short s2 = s1 + 1;//编译报错
+```
+
+**java编译器会根据类型和字面值的取值确定字面值的类型**
+
+```
+byte b = 12; //正确
+byte b = 1234; // 错误
+float f = 12.3; // 错误
 ```
 
 强制转型(向下转型)
@@ -460,9 +528,92 @@ private static final long serialVersionUID = 1L;
 3. 抽象类方法的修饰符没有限制, 但可以包含抽象方法
 ```
 
+## 1.13 泛型和泛型擦除
 
+## 1.14 包装类
 
-# 2. Java集合
+自动装箱和自动拆箱
+
+```
+int i = new Integer(1) // 实际上是将new Integer(1).value赋值给i
+Integer j = 1; // 右边实际上是调用了Integer.valueOf(1)方法, 会使用IntegerCache
+```
+
+Integer中有一个静态内部类IntegerCache, 在类初始化时会将值为[-128, 127]的Integer对象放到缓存数组中, 调用Integer.valueOf()方法如果值在这个范围内会直接返回缓存中的Integer对象
+
+```java
+    public static Integer valueOf(int i) {
+        if (i >= IntegerCache.low && i <= IntegerCache.high)
+            return IntegerCache.cache[i + (-IntegerCache.low)];
+        return new Integer(i);
+    }
+```
+
+## 1.15 反射
+
+获取反射对象的方式
+
+```
+Class.forName()
+类名.class
+对象.getClass()
+```
+
+## 1.16 IO
+
+Java中的IO流分为InputStream OutputStream Reader Writer
+
+## 1.17 内部类
+
+内部类分为静态内部类, 成员内部类, 局部内部类
+
+```
+静态内部类不依赖外部类而存在, 使用Outter.Inner表示静态内部类的类型, 可以访问外部类所有static属性和方法
+
+成员内部类依赖于外部类的对象存在, 可以访问外部类对象的所有属性和方法
+```
+
+## 1.18 常用设计模式
+
+单例模式
+
+```
+JDK中的Runtime, 单例模式适合用在在大对象/占用资源多的对象
+```
+
+建造者模式
+
+```
+JDK中的StringBuilder, 建造者模式适合用在对象有复杂的建造过程的情况
+```
+
+工厂模式
+
+```
+JDK包装类的valueOf方法, 工厂模式主要作用是将对象创建过程解耦出来
+```
+
+观察者模式
+
+```
+Java中的Swing GUI,  当被观察者的状态发生改变时自动通知观察者做出响应
+```
+
+代理模式
+
+```
+Spring中的AOP, 代理对象对被代理对象做了功能上的增强
+```
+
+装饰者模式
+
+```
+Java中的IO流, BufferedReader和Reader
+```
+
+.
+
+# 2. Java容器
 
 Java集合的体系
 
@@ -597,6 +748,13 @@ HashMap的长度为2^n的目的是便于求模(length-1再&hash)
 newCap = oldCap << 1
 ```
 
+**HashMap1.7->1.8改进**
+
+```
+* 使用尾插法而不是头插法
+* 链表过长时会转化成红黑树
+```
+
 ### 2.3.3 红黑树
 
 红黑树的定义
@@ -636,7 +794,7 @@ newCap = oldCap << 1
 public synchronized V put(K key, V value)
 ```
 
-HashTable的key, value不能为null
+HashTable的key, value不能为null(**需要作为****synchornized的锁**)
 
 ```java
         Hashtable<String ,Integer> table = new Hashtable<>();
@@ -651,7 +809,6 @@ TreeSet底层使用TreeMap, 可以实现排序, 排序使用Comparator, 如果�
 
 **TreeMap底层使用红黑树,** 比较大小可以使用comparator/自然排序, 复杂度logN
 
-
 ### 2.3.7 Hash冲突解决方法
 
 ```
@@ -660,7 +817,6 @@ TreeSet底层使用TreeMap, 可以实现排序, 排序使用Comparator, 如果�
 3. 冲突的位置使用链表
 4. 将冲突的元素放到公共的溢出表
 ```
-
 
 ## 2.5 ConcurrentHashMap
 
@@ -685,3 +841,7 @@ ConcurrentHashMap 底层结构和HashMap相同
 		//遍历链表/红黑树插入节点
 	     }
 ```
+
+## 2.6 Pair
+
+## 2.7 PriorityQueue
