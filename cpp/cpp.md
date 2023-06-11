@@ -1,3 +1,63 @@
+# 0. 相关概念
+
+## 0.2 GNU
+
+什么是GNU?
+
+```
+GNU是一个自由软件计划, 这个计划的目的是创造出高质量且可以自由使用的操作系统相关的一系列软件
+```
+
+什么是GPL?
+
+```
+软件开源协议, 协议的内容要求可以自由使用软件但不能将软件占为己有, 要承认所有开源者的贡献
+```
+
+什么是GCC/gcc/g++?
+
+```
+GCC全称GNU Compiler Collection, 包含多种语言的编译器(c/cpp/java/fortran)
+gcc和g++都是GNU中的编译器
+* 对于.c/.cpp, gcc分别当作c文件和cpp文件编译
+* 对于.c/.cpp, g++只当作cpp文件编译
+```
+
+MinGW和msvc是什么?
+
+```
+MinGW: Miniallist GNU for windows, 将部分GNU工具移植到Windows平台后的工具集
+msvc: Microsoft Visual C++编译器, Windows平台非常流行的编译器
+```
+
+make和Cmake是什么?
+
+```
+make是GNU下的一个构建工具, 用于自动编译并链接从而生成可执行文件, 使用Makefile来确定构建项目的过程
+Cmake是make的跨平台版本, 使用CMakeLists.txt来确定构建过程
+```
+
+## 0.3 预编译指令
+
+常用的预编译指令有哪些?
+
+```
+#include
+#define
+#ifndef ... #endif
+#pragma //设置编译器参数
+```
+
+## 0.5 h & cpp
+
+头文件和cpp源文件的区别?
+
+```
+头文件可能被多次include, 可能被多次编译, 所以头文件中一般只包含声明并使用#ifndef #define #endif包括, 如果包含具体实现可能会导致重定义冲突.
+
+源文件不会被include, 一般用于写具体实现
+```
+
 # 1. 硬件相关
 
 ## 1.1 内存分区
@@ -68,8 +128,6 @@ int main() {
     out::print(ret);
 }
 ```
-
-
 
 ## 2.6 内存管理
 

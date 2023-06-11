@@ -2,10 +2,9 @@
 
 ## 1.1 方法
 
-方法重载: 多个同名方法共存
+* 方法重载(overload):  多个方法的**方法名相同, 返回类型和参数列表互不相同**
 
 ```java
-    //方法名相同, 参数列表不同, 返回值可以不同, 修饰符可以不同
     public int getSum(int a, int b){
         return a+b;
     }
@@ -14,7 +13,7 @@
     }
 ```
 
-方法重写(override): 覆盖父类的方法
+* 方法重写(override): **子类中方法的方法名&返回类型&参数列表和父类相同**, 子类方法比父类方法权限修饰符更大, 抛出的受检查异常更小
 
 ```java
         Runnable runnable = new Runnable() {
@@ -25,11 +24,7 @@
         };
 ```
 
-方法的参数传递
-
-* 基本数据类型传递值, 引用类型传递引用(可以理解为单层指针)
-* 参数不能使用默认值, 默认值通过重载方法实现
-* 可以使用不定项参数
+* 方法的参数传递方式: 基本类型使用传递值, 引用类型传递引用, 不能使用参数默认值, 支持不定参数
 
 ```java
     public void printParameterLength(int... args){
@@ -37,27 +32,20 @@
     }
 ```
 
-常用方法
+* Object方法及部分常见方法/运算
 
 ```java
-        System.out.println("hello,world!");
-        /**
-         * == 判断引用的是否是同一个对象
-         * 一般重写equals方法比较对象逻辑上是否相同
-         */
-        this.equals(null);
-        /**
-         * clone可以进行对象的浅复制
-         * native方法比new一个对象再复制快得多
-         */
-        Object obj = this.clone();
-         /**
-         * 对象被当作垃圾要回收前时调用的一个函数, 小心使用, 防止对象复活
-         */
-        this.finalize();
-	//instanceof 判断对象是否属于某个类/子类
-        new String() instanceof Object
+System.out.println("hello" + " world!"); // 标准输出
+new Scanner(System.in).nextInt(); //标准输入
+obj.equals(obj2); // 判断两个对象逻辑是否相等, 默认实现体使用==
+obj.hashCode(); // 返回对象的哈希值
+obj.toString(); // 返回对象的String表示形式, 会用于标准输入
+obj.clone(); //浅拷贝
+obj.finalize(); // 对象将被gc时会调用的一个方法
+obj instanceof Object; // 判断对象是否是某个类及其子类对象
 ```
+
+
 
 ## 1.2 数组
 
@@ -146,9 +134,6 @@ Java中的注解分为7个元注解(Java语言自带的注解)和程序员自定
 | @Documented          | 声明自定义注解是否加入文档                                                                                   |
 | **@Target**    | 声明自定义注解的使用范围<br />ElementType.FIELD<br />ElementType.METHOD<br />ElementType.TYPE                |
 | **@Inherited** | 声明自定义注解的是否有继承性                                                                                 |
-
-
-
 
 * 自定义的注解
 
@@ -520,12 +505,12 @@ private static final long serialVersionUID = 1L;
 
 ## 1.12 接口和抽象类
 
-两者区别
+接口和抽象类的区别
 
 ```
 1. 接口和抽象类不能实例化
-2. 接口所有方法都为抽象的public方法, 不能有成员属性, 可以有static属性
-3. 抽象类方法的修饰符没有限制, 但可以包含抽象方法
+2. 接口所有方法都为抽象的权限修饰符为public的方法, 不能有成员属性, 只能有static属性
+3. 抽象类方法的修饰符没有限制, 但可以包含抽象方法, 可以包含成员属性和static属性
 ```
 
 ## 1.13 泛型和泛型擦除
@@ -611,7 +596,27 @@ Spring中的AOP, 代理对象对被代理对象做了功能上的增强
 Java中的IO流, BufferedReader和Reader
 ```
 
-.
+## 1.19 Socket编程
+
+ServerSocket
+
+```java
+      ServerSocket server = new ServerSocket(port);
+      Socket socket = server.accept();
+      Reader reader = new InputStreamReader(socket.getInputStream())
+      socket.close();
+```
+
+ClientSocket
+
+```java
+     Socket client = new Socket(host, port);
+     Writer writer = new OutputStreamWriter(client.getOutputStream());
+     writer.write("Hello From Client");
+     writer.flush();
+     writer.close();
+     client.close();
+```
 
 # 2. Java容器
 
@@ -845,3 +850,9 @@ ConcurrentHashMap 底层结构和HashMap相同
 ## 2.6 Pair
 
 ## 2.7 PriorityQueue
+
+# 3. Java Socket
+
+## 3.1 TCP
+
+## 3.2 UDP

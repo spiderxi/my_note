@@ -1,14 +1,32 @@
+# 0. IOC
+
+## 0.1 Spring框架结构
+
+Spring框架结构
+
+![1686328931070](image/Spring&Mvc&Boot/1686328931070.png)
+
+## 0.2 IOC容器和DI
+
+2.4
+
+IOC有什么用? DI有什么用?
+
+IOC容器继承关系和对应的功能?
+
+依赖注入的方式?
+
+## 0.3 BeanFactory
+
+BeanFactory作用?
+
+Bean的注册方式有哪些?
+
+IOC容器如何获取Bean定义到生成BeanFactory的过程?
+
+常用的XML配置文件格式?
+
 # 1. Spring Freamwork
-
-spring框架的三大核心概念: IOC DI AOP
-
-**Ioc 控制反转**: 对象的创建权交给Ioc容器, 不使用new创建, 实现解耦.
-
-**Bean**: 被Ioc容器创建和管理的对象
-
-**DI 依赖注入**: Ioc容器负责管理Bean的依赖关系, 自动注入依赖(属性)的值
-
-**AOP:** 面向切面编程
 
 ## 1.1 Ioc容器的使用(xml配置)
 
@@ -47,7 +65,6 @@ spring框架的三大核心概念: IOC DI AOP
 > Ioc容器的顶层接口类为BeanFactory**,** 所有Ioc容器都继承自这个接口
 >
 > 继承FactoryBean `b` 的类在容器中注册后会作为Bean
-
 
 ## 1.2 依赖注入(xml配置)
 
@@ -224,8 +241,6 @@ public class SpringConfig {
     public void transfer(int money);
 ```
 
-
-
 ## 1.2 事务隔离级别
 
 `Isolation.READ_UNCOMMITTED` : 事务期间其他事务写入的未提交的数据也有效___脏读问题
@@ -255,7 +270,6 @@ Propagation.REQUIRES_NEW
 ```
 
 新建一个事务(事务发起者的事务先挂起, 执行事务加入者的事务)
-
 
 # 3. SpringMVC
 
@@ -388,8 +402,6 @@ public class HelloController{
     }
 ```
 
-
-
 *@ResponseBody*
 
 默认Controller中的方法返回值会被封装成**ModelAndView**然后交由视图解析器, 解析后的页面返回前端;  添加@ResponseBody后返回值为字符串时, **直接返回前端字符串**, 返回值为Object时先使用**默认序列化器Jackson序列化**成字符串, 再返回前端.
@@ -402,7 +414,7 @@ public class HelloController{
 
 ### 3.3.3 参数的验证
 
-*@Validated* 
+*@Validated*
 
 用于RequestBody的请求体对象的校验
 
@@ -486,8 +498,6 @@ spring:
   profiles:
     active: deploy  # application-deploy.yml中的配置生效
 ```
-
-
 
 ### 4.2 自动配置原理
 

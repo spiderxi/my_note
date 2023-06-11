@@ -59,6 +59,13 @@ truncate table | delete | drop的区别
 * delete 和 truncate 只删除表的内容, drop 会删除表结构
 ```
 
+Union和Union ALL 的区别
+
+```
+union取结果集的并集, 会去除重复字段
+union all等价于将结果集纵向拼接, 不去除重复字段 
+```
+
 ## 0.2 常用的类型
 
 char/varchar(M)
@@ -79,6 +86,48 @@ int/decimal(M, N)
 int 4字节整数
 decimal(M, N): N位小数, M-N位整数
 ```
+
+## 0.3 存储过程/触发器/视图
+
+视图
+
+```sql
+// 视图是一张虚表, 当实表变化时, 视图也会变化
+create VIEW view_student_course AS (
+SELECT sid, sname, student.name from course 
+LEFT JOIN student on course.sid = student.course_id
+);
+```
+
+存储过程
+
+```sql
+// 一个过程相当于一个函数create procedure创建一个过程
+delimiter $$ 
+create procedure p7(in n int)
+begin
+	declare total int default 0;
+
+	while n>0 do
+		set total := total + n;
+		set n := n - 1;
+	end while;
+
+	select total;
+end $$
+//通过call调用一个过程
+call p7(100);
+```
+
+触发器是指在某个表上发生了事件时, 自动执行某些操作
+
+```sql
+create tigger tigger_name
+befor|after insert
+on table_name for each row tigger_stmt
+```
+
+
 
 # 1. MySQL服务器
 
@@ -162,7 +211,6 @@ char类型固定长度为255字节, varchar(M)表示最大长度为m个字符(m*
 # 2. Innodb存储引擎
 
 ## 2.0 innodb特性
-
 
 ## 2.3 行格式
 
@@ -533,6 +581,8 @@ LIMIT (start, ) [length]
 | ALL    | 扫描聚簇索引           |
 
 ### 4.1.1 慢SQL优化
+
+> SHOW profiles 查看SQL的执行时间
 
 慢SQl优化流程:
 
