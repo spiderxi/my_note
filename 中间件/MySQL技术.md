@@ -127,8 +127,6 @@ befor|after insert
 on table_name for each row tigger_stmt
 ```
 
-
-
 # 1. MySQL服务器
 
 ## 1.0 安装和配置
@@ -386,16 +384,6 @@ i: 独立性	并发事务不会影响执行结果
 d: 持久性	事务提交后对数据的改变是永久的
 ```
 
-事务SQL
-
-```sql
-BEGIN;
-
-//事务SQL
-
-IF .... ROLLBACK;
-COMMIT;
-```
 
 事务状态
 

@@ -45,8 +45,6 @@ obj.finalize(); // 对象将被gc时会调用的一个方法
 obj instanceof Object; // 判断对象是否是某个类及其子类对象
 ```
 
-
-
 ## 1.2 数组
 
 ```java
@@ -186,53 +184,42 @@ Annotation Processing Tool，简称APT，是Java提供给开发者的用于在�
 
 ## 1.5 异常处理
 
-* java异常接口为Throwable, 实现类为**Error(程序无法处理的异常)和Exception(程序可以处理的异常)**
+***Java异常处理类体系结构?***
 
-  ![1683297526407](image/Java基础/1683297526407.png)
-* 异常处理代码
+![1689059844916](image/Java基础/1689059844916.png)
+
+***Checked Exception 和 unChecked Exception的区别?***
+
+```
+Checked Exception: 编译器会检查的异常, 如果一个方法会抛出Checked Exception, 那么调用方法时要处理异常或继续抛出, 否则不能通过编译
+```
+
+***异常相关的关键字有哪些?***
 
 ```java
-try {
-    逻辑程序块
-} catch(ExceptionType1 e) {
-    处理代码块1
-} catch (ExceptionType2 e) {
-    处理代码块2
-    throw(e);    // 再抛出这个"异常"
-} finally {
-    释放资源代码块
-}
-```
+// try catch finally
+// throws: 声明方法可能抛出的异常 throw: 抛出异常
+// try-with: 自动释放资源
 
-* 异常抛出
-
-```java
-    public void test() throws Exception {//方法内部不处理异常时, 向上抛出异常
-        throw(new Exception("错误信息"));//抛出异常
-    }
-```
-
-* 打印异常栈
-
-```java
-new Exception().printStackTrace();
-```
-
-* CheckedException和UncheckedException
-
-```
-CheckedException: 不捕获就不能通过编译的异常(ClassNotFindException, IOException)
-UncheckedException: 不捕获也可以通过编译的异常(RuntimeException)
-```
-
-* try-with-resource
-
-```java
+    public void test() throws Exception {
         try(Scanner scanner = new Scanner(System.in)) {
             int i = scanner.nextInt();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        } finally {
+    	    //...
+	}
+        throw(new Exception("错误信息"));
+    }
+```
+
+***常见的异常类有哪些?***
+
+```
+NullPointerException
+ArrayIndexOutOfBoundsException
+IOException
+ArithmeticException
 ```
 
 ## 1. 6 Math&String
@@ -398,9 +385,7 @@ stream的收集操作
 
 **stream没有调用终止操作时中间操作也不会执行!**
 
-## 1.9 SPI
-
-SPI(Service Provider Interface), 是Java提供的一种服务发现机制, 可以通过接口查找相关实现类并动态加载实现类达到解耦+框架组件替换, 例如JDBC中的java.sql.Driver接口不同厂商会有不同实现
+## 1.9 SPI机制
 
 如何实现服务发现机制?
 
@@ -856,3 +841,5 @@ ConcurrentHashMap 底层结构和HashMap相同
 ## 3.1 TCP
 
 ## 3.2 UDP
+
+# 4. JDBC

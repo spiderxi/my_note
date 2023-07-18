@@ -1,6 +1,6 @@
 VScode KeyMap PLUS版
 --------------------------
-必要快捷键
+开发必要快捷键
 --------------------------
 ctrl+j     |  Left
 ctrl+k     |  Right
@@ -20,4 +20,6 @@ alt+shift+↓|  整行向下复制
 alt+h      |  type hierarchy
 alt+s      |  reformat file
 alt+←/→    |  返回上/下一个浏览位置
+alt+t      | 划词翻译
+shift&shift| 全局查找
 -------------------------
