@@ -1,0 +1,33 @@
+--------------------------
+My Intelli IDEA KeyMap
+--------------------------
+
+ctrl+j     |  Left
+ctrl+k     |  Right
+ctrl+i     |  Up
+ctrl+m     |  Down
+ctrl+h     |  Move caret To line head
+ctrl+;     |  Move caret To line end
+
+
+ctrl+c     |  copy
+ctrl+s     |  save
+ctrl+x     |  cut
+ctrl+v     |  paste
+ctrl+r     |  replace
+alt+↓/↑    |  整行向下/上移动
+alt+shift+↓|  整行向下复制
+alt+s      |  reformat file
+
+ctrl+点击  |  查看定义
+alt+d      |  查看定义
+ctrl+e     |  快速跳到下一个错误或警告
+ctrl+f     |  find
+ctrl+shift+f | 全局查找
+alt+h      |  type hierarchy
+alt+←/→    |  返回上/下一个浏览位置
+
+ctrl+d     |  send EOF
+alt+t      |  划词翻译
+alt+enter  |  快速修复/show intention action
+shift,shift|  全局查找文件

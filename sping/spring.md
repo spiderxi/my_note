@@ -174,7 +174,7 @@ singleton(默认scope): 每次从容器中获取的bean是同一个对象
 prototype: 每次从容器中获取的bean是新的对象
 
 还有三个不常用且仅在WebApplicationContext中生效的scope:
-request / session / global session
+request / session
 ```
 
 ## 1.5 Bean的生命周期
@@ -182,12 +182,17 @@ request / session / global session
 ***bean的生命周期?***
 
 ```
-1. IOC容器启动
-2. (getBean()方法调用时开始)时实例化(instantiation)
+1. IOC容器启动, 读取配置文件并生成Bean定义类
+2. 通过反射实例化(instantiation)
 3. 属性注入(Populate properties)
-4. 初始化(initialization)
-5. 使用(in use)
-6. 销毁(destory)
+4. 调用各种Aware接口的方法
+5. BeanPostProcessor的beforeInitialization方法
+6. 如果实现了接口InitializingBean会调用afterPropertySet()方法
+7. 调用初始化方法(init-method)
+8. BeanPostProcessor的afterInitialization方法
+-----
+
+9. 调用destory-method
 ```
 
 ![1688965693587](image/Spring&Mvc&Boot/1688965693587.png)
@@ -568,7 +573,7 @@ singletonFactories: 缓存bean的ObjectFactory对象
 
 ***为什么是三级而不是二级缓存?***
 
-如果只有循环依赖问题理论只需要二级缓存就可以解决, 引入`earlySingtonObjects`的作用是缓存早期代理对象
+如果只有循环依赖问题理论只需要二级缓存就可以解决, 引入 `earlySingtonObjects`的作用是缓存早期代理对象
 
 ![1689586509862](image/spring/1689586509862.png)
 
@@ -855,7 +860,6 @@ public class MyApplication {
 }
 ```
 
-
 ## 5.2 @SpringBootApplication
 
 ***springboot自动配置原理?***
@@ -878,7 +882,7 @@ List<String> configurations = SpringFactoriesLoader.loadFactoryNames(this.getSpr
 
 ***jar包是什么, jar包约定的目录结构是什么?***
 
-一个普通java程序被打包后形成的文件称为jar包, 可以通过`java Xxx.jar`直接执行
+一个普通java程序被打包后形成的文件称为jar包, 可以通过 `java Xxx.jar`直接执行
 
 jar包约定目录结构
 
@@ -900,15 +904,25 @@ jar包约定目录结构
 
 ***springboot如何导入配置文件中的属性值?***
 
-使用 `@Value/@ConfigurationProperties(prefix = "")`
+使用 `@PropertySource() `导入配置文件的所有属性,  使用 `@Value/@ConfigurationProperties(prefix = "")`注入
 
 ```java
+@PropertySource("classpath:my_application.yml")
+@Configuration
+public class AppConfig {
+}
+
+//----------------------------------------
+
     @Value("${myapp.property}")
     private String myProperty;
+
 //----------------------------------------
 
 @Component
 @ConfigurationProperties(prefix = "myapp")
+// 如果这个类没有被@Component标记, 需要其他被注册的类
+// 标注@EnableConfigurationProperties({MyProperties.class})
 public class MyProperties {
     private String property;
 }
@@ -917,3 +931,19 @@ public class MyProperties {
 ***多配置文件如何设置?***
 
 主配置文件 `application.yml`中设置 `spring.profiles.active: Xxx` 启用从配置文件 `application-Xxx.yml`
+
+# 6. SpringSecurity
+
+***SpringSecurity的身份认证原理?***
+
+```
+* 基于Servlet容器的过滤器实现了一个过滤器链, 过滤器链获取Authentication对象放入SecurityContext中
+
+* SecurityContext位于SecurityContextHolder中
+
+* UserDetailsService通过访问数据库返回用户信息对象
+
+* 登录时使用UserDetailsService.loadUserByUsername获取UserDetails, 生成JWT返回给前端, 并将JWT存入Redis
+
+* 在过滤器链链中添加JWT认证过滤器, 获取请求头中的toke并验证token是否在redis中, token有效则生成Authentication对象放到SpringSecurityContext中
+```
