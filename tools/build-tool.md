@@ -5,19 +5,19 @@
 ***为什么你要使用Maven?***
 
 ```
-如果不使用Maven, 需要手动使用javac编译所有class文件并使用jar打包class文件和资源文件, 使用java运行jar包和测试
+如果不使用Maven, 需要手动使用javac编译出所有class文件并使用jar打包class文件和资源文件, 使用java运行jar包和测试
 ```
 
 ***怎样理解Maven中的约定大于配置(Convention Over Configuration)?***
 
-maven中使用的属性值都有默认值(例如源码路径为 `src/main/java`)
+maven中使用的属性都有默认值(在super pom中可以查看), 下面是常用的默认值:
 
 ![1696733941119](image/build-tool/1696733941119.png)
 
 ***怎样统一个项目中所有人员使用的maven版本?***
 
 ```
-1. 在项目中使用mvn -N wrapper:wrapper 生成 mvnw.cmd/mvnw 批处理文件
+1. 在项目中使用mvn -N wrapper:wrapper 生成 mvnw.cmd 脚本
 
 2. 使用 mvnc.cmd 替代 mvc 指令
 ```
@@ -49,7 +49,7 @@ maven中使用的属性值都有默认值(例如源码路径为 `src/main/java`)
 
 ```
 * goals指插件内部的指令
-* phase指插件关注的声明周期阶段
+* phase指插件关注的生命周期阶段
 
 使用 mvc <phase> 或 mvn <plugin>:<goal>执行插件
 ```
@@ -60,7 +60,7 @@ maven中使用的属性值都有默认值(例如源码路径为 `src/main/java`)
 profile中的配置只有在满足profile的条件时才会生效
 ```
 
-> 当多个profile同时生效时, 会合并profile, 按照 ` pom.xml > settings.xml; 后 > 前`的优先级覆盖
+> 当多个profile同时生效时, 会合并profile, 按照 ` pom.xml > settings.xml`的优先级覆盖
 
 ## 3. 依赖管理
 
@@ -71,7 +71,7 @@ profile中的配置只有在满足profile的条件时才会生效
 * runtime: 运行需要的依赖
 * test: 测试需要的依赖
 * optional: 无依赖传递性的依赖
-* provided: 运行环境提供的依赖
+* provided: 由运行环境提供的依赖
 ```
 
 ***版本号 `1.0-SNAPSHOT` 中的SNAPSHOT有什么含义?***
@@ -100,5 +100,6 @@ profile中的配置只有在满足profile的条件时才会生效
 
 `local repository  =>  mirror  =>  remote repositroy(such as the central)`
 
-
 # 2. Webpack
+
+# 3. Make
