@@ -727,43 +727,31 @@ public class TestController {
 
 ### 4.2.2 传递参数和依赖
 
-***springmvc框架会给被映射的方法自动注入相关依赖的参数类型有哪些?***
+***springmvc接口方法会自动注入依赖的参数类型有哪些?***
 
 ```
-HttpServletRequest/HttpServletResponse/HttpSession/WebRequest: 注入servlet技术的request/response/session对象/spring封装的request对象
+>> HttpServletRequest/HttpServletResponse/HttpSession/WebRequest等Servlet中的请求响应类
 
-InputStream/OutputStream/Reader/Writer: 注入request/response对应的io流
+>> InputStream/OutputStream/Reader/Writer: 请求或响应对应的IO流
 
-Map/ModelMap/ModelAndView/String(视图名称): 注入Handler将要返回的ModelView对象
+Map/ModelMap/ModelAndView/String(视图名称): 要返回的ModelView对象
 
 BindingResult: 注入参数验证结果
 ```
 
-***query参数或路径参数如何映射到方法参数?***
+***query参数/请求头参数如何绑定?***
 
 ```
-如果方法参数类型是基本类型+String, 默认将与方法的参数名同名的参数绑定, 除非使用@RequestParam指定query参数名或路径参数名(扩展注解: @PathVariable)
-
-
-
-如果方法参数类型是除String外的Object子类, 将参数绑定到对象的同名字段
+使用@RequestParam
 ```
 
-```java
-    @GetMapping("/add")
-    //  /add?a=1&b=2
-    public String add1(@RequestParam("a") int aaa, int b){
-        return "resultViewName";
-    }
+> 易踩坑点: 前端 `<form>`提交会发起特殊POST请求, 表单数据被编码刀请求体中, 服务器视这些为query参数
 
-    @PostMapping("/add/{a}/{b}")
-    //  /add/1/2
-    public String add2(@PathVariable int a, @PathVariable int b){
-        return "resultViewName";
-    }
+***如何绑定路径参数?***
+
 ```
-
-> 易踩坑点: 表单提交方式是一种特殊的POST请求, 表单数据被编码成a=1&b=2的形式到请求体中, 但服务器依然把这些参数视作query参数
+使用@PathVariable
+```
 
 ***请求体如何绑定到方法参数?***
 
@@ -774,26 +762,14 @@ BindingResult: 注入参数验证结果
 ***如何添加请求中不存在但需要的绑定参数?***
 
 ```
-继承HandlerMethodArgumentResolver类, 并通过WebMvcConfigurer配置
-
-使用WebMvcConfigurer还可以配置HandlerInterceptor/跨域处理
+实现HandlerMethodArgumentResolver子类, 并通过WebMvcConfigurer配置
 ```
 
 ***绑定后的方法参数如何验证字段合理性?***
 
-使用javax.validation.Valid注解标注需要验证的参数, BindingResult接受验证结果
-
-```java
-    @PostMapping("/register")
-    public String registerUser(@Valid User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) { // 验证结果出错了
-            return "error_page";
-        }
-        return "redirect:/success";
-    }
 ```
-
-定义验证规则使用JSR规范下的注解标注方法参数的类型(可以通过继承@Constraint自定义验证注解)
+接口方法参数中使用BindingResult绑定验证结果(项目需要添加Java验证注解+验证框架依赖)
+```
 
 ## 4.3 前端与后端配置
 
