@@ -671,81 +671,75 @@ TransactionStatus txStatus = transactionManager.getTransaction(txDef);
 
 # 4. SpringMVC
 
-## 4.1 原理图和重要Bean
+## 4.1 原理图
 
-***springmvc基本组件有哪些, 各自的作用?***
+***Springmvc基本组件有哪些, 各自的作用?***
 
 ![1673255572208](image/Spring/1673255572208.png)
 
 ```
-DispatherServlet: 是一个Servlet, 拦截了所有请求, 并统一分发给特定的Handler(Controller的HandlerAdpater是Handler的一种)
+DispatherServlet: 是一个Servlet, 拦截了所有请求, 并统一分发给特定的Handler(HandlerAdpater将Controller适配为Handler)
 
-HandlerMapping: 负责url到Handler的映射, 返回HandlerExecutionChain(包含Handler和HandlerInterceptor)
+HandlerMapping: 负责请求到Handler的映射, 返回处理链(包含Handler和拦截器以及异常处理器)
 
-HandlerAdpater: 处理请求并返回ModelAndView
+Handler: 处理请求并返回ModelAndView
 
-ViewResolver: 接受ModelAndView, 返回View, View通过response对象的输出流将视图返回给前端(不同模板引擎会有不同的ViewResolver实现)
+ViewResolver: 接受ModelAndView, 返回View, View的输出流写入响应体
 ```
 
-***Springmvc中其他次要组件和作用?***
+***讲一下Springmvc处理链中的拦截器和异常解析器?***
+
+```
+拦截器:  在Handler处理请求前,后以及视图渲染完这三个时刻进行拦截
+
+异常解析器: 处理器链中抛出了异常时异常解析器处理并返回默认的ModelAndView
+```
 
 ![1689238009204](image/spring/1689238009204.png)
 
+## 4.2 基于注解的开发
+
+### 4.2.1 Controller
+
+***Controller及其方法上常用的注解有哪些?***
+
 ```
-MultipartReslover: 如果是文件上传请求, 会将HttpServletRequest封装为一个 MultipartHttpServletRequest
+>> @Controller @RestController(标注所有方法均为@ResponseBody方法)
 
-HandlerInterceptor(拦截器): 在Handler处理请求前,后以及视图渲染完这三个时刻进行拦截和处理
+>> @RequestMapping @GetMapping @PostMapping
 
-HandlerExceptionResolver: 如果Handler抛出了异常没有返回预期的ModelAndView, 有这个组件根据异常处理并返回ModelAndView(一般是404/默认请求失败视图)
-```
-
-## 4.2 注解开发
-
-### 4.2.1 controller
-
-***springmvc如何声明一个controller?***
-
-```java
-@Controller
-public class TestController {
-    @RequestMapping("/test")
-    public ModelAndView test() {
-        System.out.println("test success");
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("obj", new Object());
-        modelAndView.setViewName("test");
-        return modelAndView;
-    }
-}
+>> @ResponseBody(标注方法返回值不用视图解析器解析, 直接走JackSon序列化器序列化为响应体)
 ```
 
-!!! 扩展的注解有 `@RestController, @ResponseBody(返回的对象不经过ViewResolver, 走序列化器, 默认序列化器为MappingJackson2HttpMessageConverter) @GetMapping, @PostMapping`
+> 易踩坑点: Jackson序列化对象时对象必须有getter方法
 
-> 易踩坑点: JackSon序列化使用getter方法, 所以对象的属性必须包含getter方法
+***没有被 `@ResponseBody`标注的方法的返回类型可以是什么?***
 
-!!! @Controller生效原理: `RequestMappingHandlerMapping将url映射到被@Controller和@RequestMapping标注的方法上`
+```
+>> ModelAndView Model View
+
+>> String (视图名称)
+```
 
 ### 4.2.2 传递参数和依赖
 
-***springmvc接口方法会自动注入依赖的参数类型有哪些?***
+***Controller的方法会自动注入依赖的参数类型有哪些?***
 
 ```
->> HttpServletRequest/HttpServletResponse/HttpSession/WebRequest等Servlet中的请求响应类
+>> HttpServletRequest/HttpServletResponse/HttpSession/WebRequest: Servlet的请求响应类
 
->> InputStream/OutputStream/Reader/Writer: 请求或响应对应的IO流
+>> InputStream/OutputStream/Reader/Writer: 请求或响应IO流
 
-Map/ModelMap/ModelAndView/String(视图名称): 要返回的ModelView对象
+>> Map/ModelMap/ModelAndView: 要返回的ModelView对象
 
-BindingResult: 注入参数验证结果
+>> BindingResult: 注入参数被验证框架验证的结果
 ```
 
-***query参数/请求头参数如何绑定?***
+***query参数/form表单提交参数/multipart参数如何绑定?***
 
 ```
 使用@RequestParam
 ```
-
-> 易踩坑点: 前端 `<form>`提交会发起特殊POST请求, 表单数据被编码刀请求体中, 服务器视这些为query参数
 
 ***如何绑定路径参数?***
 
@@ -753,7 +747,7 @@ BindingResult: 注入参数验证结果
 使用@PathVariable
 ```
 
-***请求体如何绑定到方法参数?***
+***请求体如何绑定为方法参数?***
 
 ```
 @RequestBody: 将请求体的JSON通过反序列化器映射为POJO
@@ -765,58 +759,50 @@ BindingResult: 注入参数验证结果
 实现HandlerMethodArgumentResolver子类, 并通过WebMvcConfigurer配置
 ```
 
-***绑定后的方法参数如何验证字段合理性?***
+## 4.3 MVC配置
+
+> Tips: SpringMVC的配置类需要继承自WebMvcConfigurer)
+
+***如何配置拦截器 `(HandlerInterceptor)`?***
 
 ```
-接口方法参数中使用BindingResult绑定验证结果(项目需要添加Java验证注解+验证框架依赖)
+重写配置类的addInterceptors()
 ```
 
-## 4.3 前端与后端配置
+***如何配置序列化器 `(HttpMessageConverters)`?***
 
-***如何通过映射到静态资源(html/css/js)?***
-
-自定义WebMvcConfigurer
-
-```java
-@Configuration
-public class MvcConfig implements WebMvcConfigurer {
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/");
-    }
-}
+```
+注册类型为HttpMessageConverters的Bean
 ```
 
-> !!!易踩坑点:
+***如何配置参数解析器(`ArgumentResolvers`), 参数解析器的作用?***
+
+```
+重写配置类的addArgumentResolvers(), 参数解析器可以自定义Controller方法的参数绑定逻辑
+```
+
+***如何配置静态资源处理器(ResourceHandler)?***
+
+```
+重写配置类的addResourceHandlers()
+```
+
+> !!! 易踩坑点: 在通过前端路由实现的单页面应用中, 资源处理器应当:
 >
-> 前端路由实现原理: 通过js监听url路径变化, 判断新url是否符合路由规则里, 如果符合则跳转页面, 否则展示默认路由页面, 不会将请求发送到后端
->
-> 通过异步请求(XmlHttpRequest)的请求不会被路由拦截, 访问的才是后端的静态资源
+> * 对所有请求路径不匹配/static/* 的请求, 返回index.html;
 
-***什么是跨域请求? 如何处理跨域问题?***
+***如何处理跨域问题?***
 
 ```
-浏览器根据同源策略, 从js代码请求的后端接口的ip不能与当前打开页面的ip不同, 不同时拦截请求
-服务器也默认不会允许用户发起请求的页面的ip与服务器ip不同, 不同时拒绝请求
+浏览器根据同源策略, XHR请求中的域名如果和当前域名不同, 会拦截该跨域请求; 服务器默认也会拦截跨域请求(除非配置了允许的跨域)
 ```
 
-服务器可以通过配置来允许跨域请求, 不支持CROS的浏览器通过特定的技术来绕过跨域(如JSONP)
+解决方法:
 
-springmvc配置跨域
+```
+>> SpringMVC服务器通过配置类的addCorsMappings()方法配置服务器允许的跨域
 
-```java
-@Configuration
-public class CorsConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")  // 设置允许跨域访问的源地址，可以使用 * 表示允许所有来源
-                .allowedMethods("*")  // 设置允许的HTTP方法，如 GET、POST 等
-                .allowedHeaders("*")  // 设置允许的请求头，默认允许所有请求头
-                .allowCredentials(true);  // 是否允许发送Cookie信息
-    }
-}
+>> 浏览器可以通过JsonP等技术绕开跨域限制, 也可以直接使用允许跨域的浏览器
 ```
 
 # 5. SpringBoot

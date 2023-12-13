@@ -1,4 +1,4 @@
-# Vue CLI脚手架
+# 1. Node开发环境
 
 ## 安装创建项目
 
@@ -27,7 +27,7 @@ module.exports = defineConfig({
 })
 ```
 
-# Basic
+# 2. Basic
 
 ## data(){}函数
 
@@ -111,7 +111,7 @@ export default {
     //这样p的属性pAge被外部变量age代理了
 ```
 
-# 事件绑定@
+# 3. 事件绑定@
 
 ## methods和func($event, ...params)用法
 
@@ -338,7 +338,7 @@ export default {
 </script>
 ```
 
-# 其他指令
+# 4. 其他指令
 
 ## v-show, v-if---条件渲染
 
@@ -524,7 +524,7 @@ export default {
 </script>
 ```
 
-# 生命周期
+# 5. 生命周期
 
 ## 组件的生命周期
 
@@ -726,7 +726,7 @@ Vue.mixin({
   },
 ```
 
-# 全局事件总线
+# 6. 全局事件总线
 
 ## Vue.prototype.$bus
 
@@ -846,51 +846,43 @@ beforeDestroy() {
   </child>
 ```
 
-# 路由
+# 7. 前端路由
 
-## 安装和配置路由
+## 1.  单页面应用原理
 
-* `npm install vue-router@3` vue2使用3.0版本
-* 在@router/index.js下配置要暴露的router对象
+***使用vue默认路由时如何在前端控制路由页面?***
 
-```js
-import VueRouter from 'vue-router';
-//导入组件
-import HelloWorld from '../components/HelloWorld';
-import Child from '../components/Child';
-const router = new VueRouter({
-    routes:[
-        {
-            name: 'helloworld',
-            component: HelloWorld,
-            path: '/helloworld',
-            children:[//子路由
-                {
-                    name: 'child',
-                    component: Child,
-                    path: '/helloworld/child',
-                }
-            ]
-        }
-    ]
-});
-export default router;
+```
+使用v-if v-show控制html元素
 ```
 
-* 在main.js中导入插件和router对象
+***vue-router是如何实现前端路由控制的?***
 
-```js
-//main.js中使用插件和配置路由器对象
-import VueRouter from 'vue-router';
-Vue.use(VueRouter);
-import router from './router/index';
-
-
-new Vue({
-  render: h => h(App),
-  router: router//使用路由
-}).$mount('#app')
 ```
+使用History API修改浏览器显示的地址, 同时监听并拦截浏览器前进/后退/跳转/点击等事件, 改为渲染对应的组件到页面上并修改页签icon+标题
+```
+
+***如果直接在浏览器新空白页签地址栏上输入路由后的地址会怎样?***
+
+```
+服务器接收到请求后, 服务器判断url是否匹配" /static/* ":
+
+>> 如果匹配, 返回服务器/static/*里的静态文件
+
+>> 否则, 返回单页面应用的index.html, 然后由前端的router渲染该前端路由对应的页面
+```
+
+***单页面应用和多页面应用的区别?***
+
+```
+>> 单页面应用过渡动画更流畅, 搭配XHR可以局部更新
+
+>> 多页面应用只能共享同域名下的cookie和localStorage
+```
+
+## 2. Vue-Router API
+
+## 3. 一次路由的生命周期
 
 ## 路由基本使用
 
