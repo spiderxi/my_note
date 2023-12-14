@@ -216,6 +216,8 @@ $$
 \frac{dy}{dx} + P(x)y - Q(x) = 0
 $$
 
+> 一阶线性方程和高阶微分方程没有通用的解法, 一般通过推导出的公式直接解
+
 ## 8. 级数与微积分
 
 ***为什么要研究级数?***
@@ -297,14 +299,12 @@ $$
 
 # 多元函数微积分
 
-## 1. 多元函数及其导数
+## 1. 多元标量函数
 
 ***什么是多元函数?***
 
 ```
 多元函数是指自变量是一个多维向量的函数
-
-tips: 常见的多元函数的向量一般为2维或3维
 ```
 
 ***导数&偏导&方向导数&梯度分别的含义是什么?***
@@ -318,10 +318,6 @@ tips: 常见的多元函数的向量一般为2维或3维
 
 >> 梯度是与最大的方向导数同方向的一个向量, 单位向量与梯度的内积 === 方向导数
 ```
-
-
-
-方向导数
 
 $$
 \begin{align*}
@@ -339,21 +335,152 @@ $$
 这里的\nabla是一个记号, 表示(\frac{\partial}{\partial x},\frac{\partial}{\partial y})
 $$
 
-梯度
-
 $$
-\nabla z = (\frac{\partial z}{\partial x}, \frac{\partial z}{\partial y})
+梯度\nabla z = (\frac{\partial z}{\partial x}, \frac{\partial z}{\partial y})
 $$
 
+## 2. 向量场
 
+***什么是向量场?***
 
-***泰勒公式是如何从单元函数推广到多元函数的?***
+$$
+向量场\vec{V}(t)是值域为向量的函数\\
+向量场可以看作标量函数组成的向量, 例如:\vec{V}(t) = (f_1(t), f_2(t))
+$$
+
+***向量场的导数衡量了什么?***
+
+$$
+向量场\vec{V}(t) = (f_1(t), f_2(t))的导数是一个向量, \frac{d\vec{V}}{dt} = (f_1'(t), f_2'(t)), 
+\\
+衡量了向量\vec{V}随t变化的变化方向和变化速度
+$$
+
+***多元函数对自变量向量v的导数是什么?***
+
+$$
+多元函数f(\vec{v})对向量\vec{v}的导数\frac{df}{d\vec{v}} 为梯度\nabla f, 
+证明: \\ 
+由于\frac{df}{d\vec{v}} . \frac{d\vec{v}}{dp} = \frac{df}{dp} 
+\\= f在\vec{v}方向上的方向导数
+\\= \nabla f. \vec{v}方向的单位向量
+\\ = \nabla f . \frac{d\vec{v}}{dp}
+$$
+
+***f(t) = [x(t), y(t)]如何对t求导?***
 
 ```
->> f的导数 => f的梯度 (2阶梯度对应2阶Hessian矩阵)
+使用链式法则
 ```
 
-![1699522222419](image/calculus/1699522222419.png)
+$$
+\frac{df}{dt} = \frac{df}{d\vec{v}} . \frac{d\vec{v}}{dt} = \nabla f. [\frac{dx}{dt}, \frac{dy}{dt}]
+$$
+
+***自变量为多维向量的向量场的散度(divergence)和旋度(curl)衡量了什么?***
+
+```
+每一个自变量为多维向量的向量场可以表示一个流体的流动方向和速度, 散度和旋度可以表示流体的特征
+```
+
+散度衡量了一个点周围极小球体表面流体的总体通量是向外(div > 0)还是向内
+
+$$
+向量场\vec{X}的散度
+div(\vec{X}) 
+\\ = \nabla . \vec{X} 
+\\= (\frac{\partial{}}{\partial{x}}, \frac{\partial}{\partial{y}}) . (f_1, f_2) 
+\\ = \frac{\partial{f_1}}{\partial{x}} + \frac{\partial{f_2}}{\partial{y}}
+$$
+
+旋度衡量了一个点周围的流体透过与旋转轴平行的十字平面(两个平面)的逆时针通量
+
+$$
+向量场\vec{X}的旋度
+curl(\vec{X}) 
+\\= \nabla \times \vec{X}
+\\= (\frac{\partial{}}{\partial{x}}, \frac{\partial}{\partial{y}}) \times (f_1, f_2)
+$$
+
+## 3. 二维平面上的微分
+
+***一个多元标量函数的Laplacian衡量了什么?***
+
+$$
+Laplacian(f) = \Delta f = f的梯度的散度 = \nabla. \nabla f
+$$
+
+```
+Laplacia衡量了一个点周围点的平均函数值 - 该点的函数值:
+>> 如果Laplacian(f) > 0, 表明在谷底
+>> 如果Laplacian(f) < 0 表明在峰顶
+```
+
+***Jocabian矩阵的基本思想是什么?***
+
+```
+任何一个非线性变换, 在一个点的无穷小附近可以近似看作线性变换, 这个线性变换对应的矩阵就是Jocabian矩阵
+```
+
+$$
+一个非线性变换\vec{V}(\vec{w}) = (P(\vec{w}), Q(\vec{w})) 在\vec{w}_0附近的近似线性变化将:\\
+1. 基(dx, 0) 变为(\frac{\partial P}{\partial x}, \frac{\partial Q}{\partial x})
+\\
+2. 基(0, dy) 变为(\frac{\partial P}{\partial y}, \frac{\partial Q}{\partial y})
+$$
+
+$$
+Jocabian矩阵相当于将向量\vec{w}指向的位置的无穷小附近进行了线性变换:\\
+
+\begin{bmatrix}
+\frac{\partial P}{\partial x} & \frac{\partial P}{\partial y}  \\
+\frac{\partial Q}{\partial x} & \frac{\partial Q}{\partial y}  \\
+\end{bmatrix}
+$$
+
+## 5. 多元标量函数的近似
+
+***如何求平面 `z = f(x, y)`在一个点 `v0`的切平面?***
+
+```
+类比单元函数f(x)的切线为y = f(x0) + f'(x0). (x - x0), 切平面为:
+```
+
+$$
+z(\vec{v}) = f(\vec{v}_0) + \nabla f(\vec{v}) . (\vec{v} - \vec{v}_0)
+$$
+
+> 切平面在切点附近可以作为原函数的线性近似
+
+***如何推导出f(x, y)在一点附近的二次(quardratic)近似?***
+
+$$
+设(x_0, y_0)附近的二阶近似为Q(x, y), 则Q的函数应当满足形式:\\
+Q(x, y) = f(x_0, y_0) + f_x(x_0, y_0)(x - x_0) + f_y(y - y_0) + \\
+\frac{1}{2} f_{xx} (x - x_0)^2 + f_{xy}(x-x_0)(y - y_0) + \frac{1}{2} f_{yy} (y - y_0)^2
+\\
+这样Q与f在该点的函数值, 一阶偏导, 二阶偏导都相同
+$$
+
+***多元函数的泰勒公式的核心思想是什么?***
+
+```
+核心思想: 如果两个多元函数在同一点处的xy的各种偏导相同并且函数值相同, 那么这两个函数在这一点的极小领域相同
+```
+
+多元函数的泰勒公式使用向量可以记作:
+
+$$
+f(\vec{v}) = f(\vec{v}_0) + \nabla f(\vec{0}) . (\vec{v} - \vec{v}_0) + \frac{1}{2!} (\vec{v} - \vec{v}_0)^TH_2(X)(\vec{v} - \vec{v}_0) + ...
+$$
+
+$$
+H_2(X)为f在点\vec{v}_0处的二阶Hessine矩阵:
+\begin{bmatrix}
+f_{xx}(\vec{v}_0)&f_{xy}(\vec{v}_0)\\
+f_{yx}(\vec{v}_0)&f_{yy}(\vec{v}_0) \\
+\end{bmatrix}
+$$
 
 ## 2. 曲线积分
 
@@ -375,57 +502,4 @@ $$
 = \frac{|d\vec{e}|}{ds} (e为切线方向的单位向量)
 \\
 = \frac{|\vec{r}'(t) × \vec{r}''(t)|}{|\vec{r}'(t)|^3}
-$$
-
-## 3. 向量场及其导数
-
-***什么是向量场?***
-
-$$
-向量场\vec{V}(t)是值域为向量的函数\\
-向量场可以看作标量函数组成的向量, 例如:\vec{V}(t) = (f_1(t), f_2(t))
-$$
-
-***向量场的导数衡量了什么?***
-
-$$
-向量场\vec{V}(t) = (f_1(t), f_2(t))的导数是一个向量, \frac{d\vec{V}}{dt} = (f_1'(t), f_2'(t)), 
-\\
-衡量了向量\vec{V}随t变化的变化方向和变化速度
-$$
-
-***标量对向量的导数衡量了什么?***
-
-$$
-多元函数f(\vec{v})对向量\vec{v}的导数\frac{df}{d\vec{v}} 为梯度\nabla f, 
-证明: \\ 
-由于\frac{df}{d\vec{v}} . \frac{d\vec{v}}{dp} = \frac{df}{dp} 
-\\= f在\vec{v}方向上的方向导数
-\\= \nabla f. \vec{v}方向的单位向量
-\\ = \nabla f . \frac{d\vec{v}}{dp}
-$$
-
-***什么是向量场的散度(divergence)和旋度(curl)?***
-
-```
-每一个向量场可以表示一个流体的流动方向和速度, 散度和旋度可以表示流体的特征
-```
-
-散度衡量了向量场某一个点周围的向量向外扩散的程度/向内收缩的程度
-
-$$
-向量场\vec{X}的散度
-div(\vec{X}) 
-\\ = \nabla . \vec{X} 
-\\= (\frac{\partial{}}{\partial{x}}, \frac{\partial}{\partial{y}}) . (f_1, f_2) 
-\\ = \frac{\partial{f_1}}{\partial{x}} + \frac{\partial{f_2}}{\partial{y}}
-$$
-
-旋度衡量了向量场中一个点周围的向量的旋转程度和旋转轴的方向
-
-$$
-向量场\vec{X}的旋度
-curl(\vec{X}) 
-\\= \nabla \times \vec{X}
-\\= (\frac{\partial{}}{\partial{x}}, \frac{\partial}{\partial{y}}) \times (f_1, f_2)
 $$
