@@ -366,7 +366,7 @@ $$
 时, f(\vec{v})取极值
 $$
 
-## 2. 向量场d
+## 2. 向量场
 
 ***什么是向量场?***
 
@@ -511,7 +511,7 @@ $$
 
 ## 5. 曲线积分
 
-***曲线的方程是什么?***
+***曲线的参数方程是什么?***
 
 $$
 空间的曲线等价于一个单变量位置向量: \\\vec{r}(t) = (x(t), y(t))
@@ -544,3 +544,56 @@ $$
 $$
 
 > 由此可以推导出如果向量场为某个函数的梯度, 那么向量场与曲线的点积积分绕一圈 = 0
+
+## 6. 多重积分
+
+***如何求f(x, y)与x-y平面围成的体积?***
+
+$$
+面积 = \int f(x, y) dS = = \int \int f(x, y)dxdy = \int [\int f(x, y)dx]dy = \int [\int f(x, y)dy]dx
+$$
+
+***一个曲面的参数方程是什么?***
+
+$$
+三维空间中的曲面都可以表示为两个参数的参数方程: \\
+\vec{r} (s, t) = (x(s, t), y(s, t), z(s, t))
+$$
+
+***曲面面积的微元和参数微元ds/dt的关系是什么?***
+
+$$
+d \sigma = d\vec{r} 在s方向差值向量和t方向差值向量的叉乘的范数 
+\\
+= |\frac{\partial \vec{r}}{\partial s} ds × \frac{\partial \vec{r}}{\partial t} dt| 
+\\
+= |\frac{\partial \vec{r}}{\partial s} × \frac{\partial \vec{r}}{\partial t}|dsdt
+$$
+
+![1702719619960](image/calculus/1702719619960.png)
+
+***如何简单描述旋度定理?***
+
+$$
+旋度定理: 向量场\vec{F}沿平面边界逆时针方向积分\oint_c \vec{F}.d\vec{r} \\
+= 向量场在该平面内的旋度的积分 \iint_S (\vec{\nabla} ×\vec{F}).d\vec{S}
+$$
+
+![1702789664669](image/calculus/1702789664669.png)
+
+> Tips: Green'Theorem是旋度定理的二维形式
+
+$$
+Green Thorem: 向量场\vec{F}=(P, Q, 0)沿封闭曲线C的逆时针积分\oint_c \vec{F}.d\vec{r} \\
+=curl(\vec{F})在C围成的区域S的积分\iint_S curl(\vec{F}).d\vec{S}
+\\ = \iint_S (0, 0, \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}). (0, 0, 1)dS
+\\= \iint_S (\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y})dS
+$$
+
+***散度定理说明了什么?***
+
+$$
+散度定理: \\
+单位时间内流体对应的向量场\vec{F}通过某个封闭曲面C的通量\oint_C\vec{F}.d\vec{S}\\
+\\=散度在这个封闭空间中的积分: \iiint_V\vec{\nabla}.\vec{F}. dV
+$$
