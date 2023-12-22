@@ -1,6 +1,3 @@
---------------------------
-My Intelli IDEA KeyMap
---------------------------
 
 ctrl+j     |  Left
 ctrl+k     |  Right
@@ -8,8 +5,8 @@ ctrl+i     |  Up
 ctrl+m     |  Down
 ctrl+h     |  Move caret To line head
 ctrl+;     |  Move caret To line end
-ctrl+u | move caret to previous word (with selection)
-ctrl+o | move caret to next word (with selection)
+ctrl+u | move caret to previous word with selection
+ctrl+o | move caret to next word with selection
 
 
 ctrl+c     |  copy
@@ -23,12 +20,12 @@ ctrl+shift+z     |  redo
 alt+↓/↑    |  整行向下/上移动
 alt+shift+↓|  整行向下复制
 alt+s      |  reformat file
-ctrl+点击/ alt+d  |  查看定义
+
+ctrl + /   | 注释整行
+ctrl+点击/alt+d  |  查看定义
 ctrl+e     |  快速跳到下一个错误或警告
 ctrl+q     | 全局查找
-shift,shift|  全局查找文件
+ctrl+p     |  全局查找文件
 alt+h      |  type hierarchy
 alt+←/→    |  返回上/下一个浏览位置
-alt+enter   | 快捷操作
-ctrl+d     |  send EOF
-alt+t      |  划词翻译
+alt+enter   | 快速修复
