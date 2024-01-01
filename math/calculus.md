@@ -223,6 +223,11 @@ $$
 $$
 \begin{align*}
 &y'' + ay' + by = 0
+\end{align*}\\
+
+\begin{align*}
+&1. 假设y = e^{\lambda x}, 代入微分方程可得\lambda^2 + a\lambda + b = 0,原方程的解为特解的线性组合:y = Ae^{\lambda_1x} + Be^{\lambda_2x}\\
+&2.如果1中只得到一个特解y = e^{\lambda_0 x}, 那么另一个特解为y = x e^{\lambda_0 x}
 \end{align*}
 $$
 
@@ -230,6 +235,7 @@ $$
 \begin{align*}
 &y' + ay = 0
 \end{align*}
+\Rightarrow^{同二阶解法} y = Ce^{-ax}
 $$
 
 ## 8. 级数与微积分
