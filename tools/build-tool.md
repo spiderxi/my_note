@@ -112,6 +112,4 @@ profile中的配置只有在满足profile的条件时才会生效
 
 `local repository  =>  mirror  =>  remote repositroy(such as the central)`
 
-# 2. Webpack
-
-# 3. Make
+# 2. CMake
