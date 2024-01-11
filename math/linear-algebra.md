@@ -140,8 +140,29 @@ $$
 **_如何证明 Euler 公式?_**
 
 $$
-\\Euler \qquad Equation: e^{ix} = \cos(x) + i\sin(x)\\
+\\Euler \quad Equation: e^{ix} = \cos(x) + i\sin(x)\\
 将e^{ix}进行泰勒展开, 然后将展开的多项式各项然后为\cos(x), \sin(x)的泰勒展开式的项
+$$
+
+**_什么是四元组?_**
+
+$$
+一个四元组表示四维虚空间中的向量, 四元组p = a + bi + cj + dk = [a, \vec{v}]; \\
+其中i^2=j^2=k^2 = ijk = -1, i/j/k之间乘法类似于向量叉乘;\\
+a = 0时, p对应三维空间中的一个向量;
+$$
+
+**_四元组乘法的意义?_**
+
+$$
+\begin{align*}
+
+&设p = [a, \vec{v}], q=[b, \vec{u}],则pq = [ab-\vec{v}\vec{u}, a\vec{u}+b\vec{v} + \vec{u} × \vec{v}]
+\\
+&通过这个定义可以推导出四元组乘法和三维空间中的旋转满足以下关系:
+\end{align*}\\
+设向量\vec{u}绕单位向量\vec{e}旋转2\theta后的向量为\vec{v'}, 则:\\
+v' = pvp^{-1}, 其中v' = [0, \vec{v}'], v = [0, \vec{v}], p=[\cos\theta, \sin\theta.\vec{e}], p^{-1} = [\cos\theta, -\sin\theta.\vec{e}]
 $$
 
 # 2. 矩阵
