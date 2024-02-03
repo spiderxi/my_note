@@ -1,21 +1,13 @@
-# 基本概念
+# 1. 预设组件
 
-## 1. 组件
+## 1. 组件基础
+
+_Unity 游戏中 Scene GameObject MonoBehaviour 之间的关系是什么?_
 
 **_Unity 组件本质上是什么?_**
 
 ```
 一个组件本质上是一个MonoBehaviour子类, 通过组件的hook方法中定义GameObject的行为
-```
-
-**_讲一下 Transform 组件?_**
-
-```
-Tranform是一个GameObject组件栈最底层的组件, 也是必备的组件, 组件包含三个属性:
-
->> 相对于父GameObject坐标系中的属性: position
-
->> 相对于自身坐标系中的属性: rotation & scale
 ```
 
 **_Material 组件的作用?_**
@@ -38,9 +30,9 @@ Shader: GPU渲染管道的中的程序, 用于给几何体顶点和片元渲染
 >> 不同优先级: 优先级高的先执行
 ```
 
-## 2. 效率工具
+## 2. 图像与音频
 
-**_讲一下 Unity 中的图层?_**
+_讲一下 Unity 中的图层?_
 
 ```
 >> 一个组件属于一个图层, 最多可以有32个图层
@@ -50,20 +42,78 @@ Shader: GPU渲染管道的中的程序, 用于给几何体顶点和片元渲染
 >> 摄像头可以筛选可见的图层
 ```
 
-**_什么是 prefab?_**
+_实时灯光和烘焙灯光的区别?_
+
+_摄像机的深度表示什么?_
+
+_将一下 AudioListener 和 AudioSource?_
+
+_渲染器纹理是什么?_
+
+_如何将用户鼠标的点击映射到刚体上?_
+
+## 3. 地形
+
+## 4. 角色和刚体
+
+_离散碰撞检测和连续碰撞检测的区别?_
+
+_碰撞和触发的区别?_
+
+_什么是铰链?_
+
+## 5. 动画和特效
+
+## 6. 导航
+
+## 6. Unity Editor
+
+_什么是 Gizmos?_
+
+_如何快速复制一个物体并同时修改所有复制体?_
 
 ```
-一个prefab相当于一个类, 修改类后可以应用到所有实体
+使用prefab, 一个prefab相当于一个类, 修改类后可以应用到所有实体
 ```
 
-**_UnityEngine 中提供的常用类有哪些?_**
+_如何让一个物体吸附到另一个物体上?_
 
 ```
->> Debug: Unity控制台输出和辅助线绘制
-
->> Vector2/3/4: 2/3/4维向量
-
->> MonoBehaviour
-
->> Quaternion: 旋转四元组
+选中物体后按住V键, 移动物体直到顶点吸附后松开V键
 ```
+
+如何快速跳转到物体所在位置?
+
+```
+双击物体对应的文件或点击场景中的物体再按F键
+```
+
+_如何打开控制台?_
+
+```
+Ctrl + Shift + C
+```
+
+# 2. UnityEngine
+
+## 1. GameObject & MonoBehaviour & Object
+
+_获取一个场景中的 GameObject 有几种方式?_
+
+_如何创建和销毁一个 Unity Object?_
+
+## 2. Application & Debug & Time
+
+## 3. SceneManager & AsyncOperation
+
+_为什么要异步加载场景?_
+
+## 4. Vector & Quaternion & Transform
+
+## 5. Input
+
+_Input 类的作用?_
+
+_什么是虚拟按键和虚拟轴?_
+
+_触摸的阶段 TouchPhase 有哪些?_
