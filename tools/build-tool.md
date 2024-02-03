@@ -1,6 +1,6 @@
 # 1. Maven
 
-## 1. 简介
+## 1. Maven 简介
 
 **_为什么你要使用 Maven?_**
 
@@ -17,7 +17,7 @@ maven 中使用的属性都有默认值(在 super pom 中可以查看), 下面�
 **_怎样统一个项目中所有人员使用的 maven 版本?_**
 
 ```
-1. 在项目中使用mvn -N wrapper:wrapper 生成 mvnw.cmd 脚本
+1. 在项目中使用mvn -N wrapper:wrapper 生成 mvnw.cmd 脚本和maven/文件夹
 
 2. 使用 mvnc.cmd 替代 mvc 指令
 ```
@@ -38,16 +38,19 @@ mvn archetype:generate
 
 **_怎么标识唯一的项目?_**
 
-使用 `GAV` 坐标
+```
+使用GAV坐标
+```
 
 **_讲一下 POM 的继承体系?_**
 
 ```
-* 所有POM继承自Super POM, Super POM中包含maven约定的配置
-* 子POM可以覆盖父POM中的配置
+>> 所有POM继承自Super POM
+
+>> 子POM可以覆盖父POM中的配置
 ```
 
-**_讲一下 Build Lifecycle 中主要的 phase?_**
+**_讲一下 Maven 中 Build Lifecycle 中主要的 phase?_**
 
 ```
 * clean
@@ -111,5 +114,7 @@ profile中的配置只有在满足profile的条件时才会生效
 **_maven 查找依赖的顺序?_**
 
 `local repository  =>  mirror  =>  remote repositroy(such as the central)`
+
+_maven offline 模式有什么用?_
 
 # 2. CMake
