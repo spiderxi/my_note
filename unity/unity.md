@@ -1,31 +1,23 @@
-# 1. 预设组件
+# 1. 内置组件
 
 ## 1. 组件基础
 
-_Unity 游戏中 Scene GameObject MonoBehaviour 之间的关系是什么?_
-
-**_Unity 组件本质上是什么?_**
-
-```
-一个组件本质上是一个MonoBehaviour子类, 通过组件的hook方法中定义GameObject的行为
-```
-
-**_Material 组件的作用?_**
-
-```
-Material组件用于渲染物体表面的呈现效果, 由多个Shader和颜色等参数组成
-
-Shader: GPU渲染管道的中的程序, 用于给几何体顶点和片元渲染
-```
-
-**_讲一下 Unity 组件的生命周期?_**
+_讲一下 Unity 组件的生命周期?_
 
 ![1703219493521](image/unity/1703219493521.png)
 
-**_Unity 中不同组件间组件方法执行的顺序?_**
+_Update 和 FixedUpdate 的区别?_
 
 ```
->> 相同优先级: 栈顶先执行, 栈底最后执行
+1. Update每一帧执行一次
+
+2. FixedUpdate每隔固定时间Time.fixedDeltaTime执行一次
+```
+
+_GameObject 中不同组件执行的顺序?_
+
+```
+>> 相同优先级: 栈顶先执行, 栈底最后执行(transform组件最后执行)
 
 >> 不同优先级: 优先级高的先执行
 ```
@@ -55,6 +47,25 @@ _如何将用户鼠标的点击映射到刚体上?_
 ## 3. 地形
 
 ## 4. 角色和刚体
+
+_控制角色移动有哪些方式?_
+
+```
+1. Transform.Translate方法
+>> 该方法不考虑碰撞和重力
+
+2. CharacterController组件
+>> 考虑碰撞|重力|上坡
+
+3. Rigidbody组件
+>> 考虑碰撞|重力|中心|摩擦等所有刚体因素
+```
+
+_计算移动距离时为什么采用 deltaTime 乘以速度?_
+
+```
+避免不同帧率下移动速度不一致
+```
 
 _离散碰撞检测和连续碰撞检测的区别?_
 
@@ -94,15 +105,49 @@ _如何打开控制台?_
 Ctrl + Shift + C
 ```
 
-# 2. UnityEngine
+# 2. UnityEngine API
 
-## 1. GameObject & MonoBehaviour & Object
+## 1. GameObject 和 Component
 
-_获取一个场景中的 GameObject 有几种方式?_
+_如何获取同场景中的一个 GameObject?_
 
-_如何创建和销毁一个 Unity Object?_
+```
+1. 通过路径|名称获取
+>> GameObject.Find()
 
-## 2. Application & Debug & Time
+2. 通过Tag获取
+>> GameObject.FindWithTag()
+```
+
+_如何获取一个 GameObject 关联的组件?_
+
+```
+使用Component#GetComponent()
+
+tips: MonoBehaviour继承自Component
+```
+
+_如何创建和销毁一个 GameObject?_
+
+```
+Object.Instantiate() 和 Object.Destroy()
+```
+
+## 2. Application
+
+_Time.deltaTime 和 Time.fixedDeltaTime 的区别?_
+
+```
+1. Time.deltaTime是两帧之间间隔的时间
+
+2. Time.fixedDeltaTime是两次FixedUpdate调用的间隔时间
+```
+
+_如何实现慢动作?_
+
+```
+修改Time.timeScale
+```
 
 ## 3. SceneManager & AsyncOperation
 
