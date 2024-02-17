@@ -1,202 +1,185 @@
-# 1. SVN介绍
+# 1. SVN
 
-## 1.1 基本介绍
-
-* SVN的全称是Subversion, 属于**集中式**版本控制软件, 所谓集中式指的是SVN分为客户端和中心服务器
-* SVN客户端(Tortoise SVN)和服务器(VisualSVN Server)通过网络同步项目, **客户端只有一个当前版本**(无历史版本和分支), **服务器会保存所有历史版本**, 并将最新commit的版本作为版本号最高的版本
-* 架构图如下
-
-![1688630790527](image/svn/1688630790527.png)
-
-## 1.2 SVN项目版本管理流程图
-
-![1688461667558](image/svn/1688461667558.png)
-
-# 2. SVN CLI基本指令介绍
-
-**checkout** & export
+_SVN 是集中式的版本控制工具体现在哪里?_
 
 ```
-通过URL和账号密码将服务器上的项目copy下来, checkout的方式相较于export的方式会额外包含.svn目录
+客户端只有一个工作区版本, 服务器会保存所有历史版本和分支
+
+tip: 常用的SVN客户端为Tortoise SVN和服务端为VisualSVN Server
 ```
 
-**update** & update to revision
+_如何使用 SVN 对项目进行进行版本控制?_
 
 ```
-update: 将服务器上的最新版本同步到本地(可能需要合并冲突)
-update to revision: 将服务器上特定的版本同步到本地
+1. checkout
+>> 将服务器上最新的版本复制到本地工作区
+
+2. update
+>> 将服务器上的最新版本合并进本地工作区(可能需要合并冲突)
+
+3.commit
+>> 将本地工作区上传到服务器作为最新版本, commit需要先进行update
+
+4. revert
+>> 将本地工作区上做的新修改全部丢弃
 ```
 
-**commit**
+# 2. Git
+
+## 1. 基本使用
+
+_Git 和 SVN 的主要区别?_
 
 ```
-将本地副本同步到服务器上作为最新版本
+1. Git是分布式, SVN是集中式
+>> Git本地保存了版本树, 而SVN本地只有一个工作区
+
+2. 分支的实现方式不同
+>> SVN通过文件副本实现分支(分支合并困难), Git通过指针的方式实现
 ```
 
-**revert**
+![1708176110447](image/version-control/1708176110447.png)
+
+_如何使进行代码版本管理?_
 
 ```
-将本地副本上做的修改进行撤销(可以撤销具体文件上进行的修改)
+1. 初始化Git本地仓库
+git init
+
+2. 添加当前文件夹进暂存区, Git开始跟踪当前文件夹
+git add .
+
+3. 将工作区提交到本地仓库作为当前分支下一个节点
+git commit -m "提交信息"
+
+tip1: 已存在的远程git仓库直接使用git clone可以fork到本地
+tip2: 本地仓库存储在".git"目录下
 ```
 
-通过设置文件夹递归属性svn:ignore(忽略文件夹中的特定名称文件)
+_如何查看文件的跟踪状态?_
 
-![1688631322044](image/svn/1688631322044.png)
+```
+git status
+```
 
-# 3. Git介绍
-
-* Git是一个**分布式版本控制软件**, 每一个Git程序同时是一个代码仓库服务器和客户端
-
-Git架构图
-
-![1688632632558](image/git&svn/1688632632558.png)
-
-# 4. Git基本使用
-
-## 1.1 CLI基本命令介绍
-
-配置签名(仅仅用于远程协作时区分操作者)
+_如何配置 Git 用户和邮箱?_
 
 ```
 git config --global user.name Shihan Wang
-git config --global user.email anonymous@gmail.com
+git config --global user.email 75361240+spiderxi@users.noreply.github.com
 ```
 
-初始化本地仓库
+_如何进行分支管理?_
 
 ```
-git init
-```
-
-添加文件到暂存区(文件被git管理)
-
-```
-git add 
-```
-
-提交暂存区文件到本地仓库作为分支的下一个版本
-
-```
-git commit -m "<备注>" <-a/文件名>
-```
-
-## 1.2 分支管理命令
-
-* Git中, 本地仓库中所有历史版本呈树状, 不同分支对应指向树的某个叶节点的指针(HEAD)
-
-![1688633250987](image/git&svn/1688633250987.png)
-
-查看当前分支
-
-```
+1. 查看当前分支
 git branch
+
+2.从当前分支处新建一个分支
+git branch <新分支名字>
+
+3. 将工作区更新为分支最新节点
+git checkout <分支名字>
+
+4. 将其他分支合并到当前分支
+git merge <分支名字>
+
+5. 查看分支图: git log --graph
 ```
 
-**从当前分支拉出一个分支**(新分支的第一个版本中文件内容和拉出节点相同)
+_reset 和 revert 的区别?_
 
 ```
-git branch <new-branch-name>
+两者都用于回滚错误的提交内容, 但HEAD指针的移动方式不同:
+
+>> reset: 将提交了错误内容的节点删除, HEAD指针前移
+>> revert: 新建一个提交节点用于删除错误内容, HEAD指针后移
+
+tip: 要当前分支回滚到上一个版本可以分别使用命令: git reset --hard HEAD^ 和 git revert HEAD^
 ```
 
-**切换分支**
+_merge 和 cherry-pick 的区别?_
 
 ```
-git checkout <branch-name>
+merge用于合并一个分支到当前分支, cherry-pick用于合并单个提交到当前分支
 ```
 
-**合并其他分支节点到当前分支并删除其他分支**
+_Git 中标签的作用?_
 
 ```
-git merge <another-branch-name> # 合并其他分支HEAD节点到当前分支
-git cherry-pick <version> # 合并其他分支历史节点到当前分支
-git branch -d <another-branch-name>
+使用tag替代提交节点的commit ID便于记忆
+
+tip1: 使用git tag <标签名称> 添加标签
+tip2: 使用git checkout <标签名称> 可将工作区替换为指定标签
 ```
 
-如果当前分支HEAD指向的节点是一个重要的版本, 可以打上Tag, 便于查找和使用
+_gitignore 文件的作用?_
 
 ```
-git tag <标签名>
+git在添加跟踪文件或文件夹时会忽略gitignore中声明的文件和文件夹
 ```
 
-将工作区&本地仓库**回退到分支的历史版本**(--soft: 回退但不删除 --hard: 回退并删除)
+## 2. 远程协作
+
+_git 如何添加和查看远程仓库?_
 
 ```
-git reset [--soft | --hard] HEAD~3   # 回退上上上一个版本 
-# soft回退后可以使用git reset + 版本号前移HEAD指针
+1. 查看仓库
+git  remote  -v
+
+2.添加仓库
+git  remote  add  <远程仓库名称例如origin>  <远程仓库URL>
 ```
 
-## 1.3 本地仓库与远程仓库的协作
-
-查看本地仓库关联的远程仓库信息
+_如何拉取和推送仓库中所有分支?_
 
 ```
-git remote -v
+git  push  <仓库名> --all
+git  pull  <仓库名> --all
+
+tip: 推送时, 相同名称的分支会进行merge操作, 发生merge冲突需要拉取解决冲突
 ```
 
-添加本地仓库关联的远程仓库
+_pull 和 fetch 的区别?_
 
 ```
-git remote add <rep-name> <rep-url>
+>> fetch仅仅拉取远程仓库R的一个分支X到本地, 拉取后的分支在本地的名称为R:X
+
+>> pull = fetch + merge
 ```
 
-**推送当前分支HEAD节点作为远程仓库的特定分支的下一个节点**
+_远程仓库认证方式有哪些?_
 
 ```
-git push <rep-url/rep-name> <需要推送的分支名>
+1. token(使用token字符串作为密码)
 
+2. ssh
+>> 使用git提供的工具ssh-keygen生成公钥私钥密钥对, 将公钥上传到远程仓库
+>> 使用ssh协议访问远程仓库
+
+3. username+password(用户名+密码)
 ```
 
-* git push到的远程分支可能版本号更高, 这时可以选择:  先pull合并再push或 `git push --force`(**想要回退远程仓库的分支可以先回退本地分支再force push到远程仓库**)
+## 3. Git 规范
 
-**拉取远程仓库特定分支新节点到本地仓库并合并到工作区的当前分支上**
-
-```
-git pull <rep-url/rep-name> <远程仓库上需要拉取的分支>   //拉取并合并到当前分支
-git pull == git fetch + git merge
-```
-
-![1688634112305](image/git&svn/1688634112305.png)
-
-**克隆远程仓库所有分支到目录**
+_GitFlow 分为哪五个分支?_
 
 ```
-git clone <rep-url>
+>> master: 线上分支
+
+>> hotfix: 从master分支派生, 用于修复线上bug, 最终会合并到master
+
+>> develop: 开发分支
+
+>> feature: 从develop分支派生, 用于开发新特性, 最终会合并到develop
+
+>> release: 从develop分支派生, 软件正式发布后该分支会被删除
 ```
 
-## 1.4 .gitignore文件
-
-* git add 时, 如果文件名在.gitignore文件中列出, 那么不会追踪该文件
-* 已经追踪的文件取消追踪需要将文件名添加到.gitignore, 并移除追踪 `git rm -r --cached <文件>`
-
-.gitignore文件语法
+_Git Commit Message 的格式是什么?_
 
 ```
-/target/*     # .gitignore/../target/下的所有文件
-*.iml         # iml结尾的所有文件
-readme.md     # 名叫readme.md的文件
-```
+<提交类型>: <提交描述>
 
-## 1.7 Git使用规范
-
-GitFlow: 一种git分支的约定, 约定了分支的名称和作用
-
-```
-Master: 线上版本
-Hotfix: 对线上版本bug的修复, 一般完成后会合并到Master
-Release: 用于生产环境下的测试
-Developer: 用于开发环境下的测试
-Feature: 用于开发新特性的分支, 完成后会合并到Developer
-```
-
-![1688636054464](image/git&svn/1688636054464.png)
-
-git commit message 规范示例
-
-```
-feat!：突破性进展, 我开发了XX新功能
-fix：修复了XX问题
-docs：新增了文档/注释
-test：增加测试代码
-revert：回滚到XX版本
-merge：XX分支合并了XX分支
+tip: 常见的提交类型有feat|fix|doc|test
 ```
