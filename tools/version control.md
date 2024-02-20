@@ -87,6 +87,12 @@ git merge <分支名字>
 5. 查看分支图: git log --graph
 ```
 
+_如何撤销工作区未提交的更改?_
+
+```
+git checkout .
+```
+
 _reset 和 revert 的区别?_
 
 ```
