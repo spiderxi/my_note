@@ -132,10 +132,16 @@ _Time.deltaTime 和 Time.fixedDeltaTime 的区别?_
 2. Time.fixedDeltaTime是两次FixedUpdate调用的间隔时间
 ```
 
-_如何实现慢动作?_
+_如何实现慢动作和快动作?_
 
 ```
 修改Time.timeScale
+```
+
+游戏程序打包后不需要加密的文件放在哪个目录中?
+
+```
+放到StreamingAssets中
 ```
 
 ## 3. SceneManager & AsyncOperation
@@ -154,4 +160,12 @@ _Input.GetAxisRaw ()和 Input.GetAxis ()有什么区别?_
 >> Input.GetAxisRaw 返回只有 -1、0、1 ，不会进行平滑插值
 
 >> Input.GetAxis 返回一个经过平滑插值的浮点数(范围为[-1,1])
+```
+
+# 3. UGUI
+
+_怎样可以让 UI 自适应屏幕分辨率变化?_
+
+```
+矩形UI元素四个角到对应的四个锚点的像素距离不会改变, 所以修改锚点在屏幕的百分比位置可以实现自适应
 ```
