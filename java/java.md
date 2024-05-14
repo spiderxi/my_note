@@ -38,7 +38,7 @@ Tip2: classpath默认包含JAVA_HOME/lib/*.jar和Main.jar
 **_`java -jar Main.jar` 和 `java -cp <classpath> xyz.Main.class`的区别?_**
 
 ```
-指定 classpath 的方式不同, -jar方式需要在 Manifest中指定 classpath
+指定启动参数的方式不同, -jar方式需要在 Manifest中指定classpath和主类
 ```
 
 ## 3. JDK
@@ -476,7 +476,7 @@ equals默认实现为==, ==比较两个Object是否为同一个引用
 **_`new String("1" + "2" + new String("3"))`_** **_共创建了几个对象?_**
 
 ```
-字符串常量池中两个对象: "12", "3"
+stringtable中两个对象: "12", "3"
 
 堆区三个对象: 值为"123"的String, 值为"3"的String, StringBuilder
 ```
@@ -494,9 +494,11 @@ equals默认实现为==, ==比较两个Object是否为同一个引用
 **_`String#intern()`方法的作用?_**
 
 ```
-将String对象放入字符串常量池, 并返回常量池中的引用
+String类会在Heap区维护一个stringtable用于保存字符串常量, stringtable是一个长度固定为1009的hashmap
+调用intern()方法时会返回stringtable.get(s), 如果get返回为null, 则会先调用stringtable.put(s, s)再返回stringtable.get(s)
 
->>> 如果常量池中已有相等的对象, 直接该对象的引用
+tip1: stringtable不会自动扩容, 但可以通过JVM参数指定长度
+tip2: 使用String#intern()方法本质上是在用时间换空间
 ```
 
 ## 3. 包装类

@@ -9,7 +9,7 @@ _为什么你使用 Maven?_
 
 1. 使用javac编译出所有class文件
 2. 使用jar打包class文件, 资源文件以及第三方jar包
-3. 使用java运行jar包和测试
+3. 使用java运行jar包和测试jar包
 4. 将jar包发送并部署到服务器
 ```
 
