@@ -245,7 +245,7 @@ serialVersionUID: 使用JDK序列化时需要指定
 
 `SPI(Service Provider Interface)` 是 Java 提供的扩展机制, 可以在运行时加载 `实现了特定接口的第三方服务实现类`
 
-> SPI 典型应用: JDBC
+> SPI 典型应用: JDBC(Java 连接关系型数据库的标准接口库)
 
 **_怎样通过 SPI 加载第三方接口实现类?_**
 
@@ -551,18 +551,18 @@ ZoneDateTime额外保存时区ZoneId, 同一个时间戳时, 时间字符串会�
 
 ## 5. 系统 API
 
-**_Java 程序如何和 shell 交互(获取环境变量, 启动参数等操作)?_**
+**_Java 应用程序如何和 Shell 交互(获取环境变量, 启动参数等操作)?_**
 
 主要用到 `System`和 `Runtime`两个类
 
 ```
 环境变量: System.getenv()
 
-启动参数+宿主机环境变量: System.getProperties()
+JVM启动参数+ OS环境变量: System.getProperties()
 
-shell实体: System.console()
+获取Shell: System.console()
 
-创建子进程执行命令: Runtime.getRuntime().exec()
+创建子进程: Runtime.getRuntime().exec()
 ```
 
 **_`AccessController.doPrivileged()`方法的作用?_**

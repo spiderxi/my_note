@@ -1,66 +1,40 @@
-# 1. IOC
+# ?1. IOC
 
-## 1. IOC 介绍
+## 1. IOC
 
-_IOC 是什么?_
+_使用 IOC 的好处?_
 
 ```
-由IOC容器关联对象之间的依赖关系, 解耦业务对象
+使用IOC容器管理对象之间的依赖关系, 解耦业务对象
 ```
 
 _IOC 容器注入依赖对象的方式有哪些?_
 
 ```
 * 构造器注入
-
 * setter方法注入
-
-tip: spring框架中使用反射注入
+* 反射注入
 ```
 
-_SpringIOC 容器继承关系?_
+_BeanFactory 和 FactoryBean 的关系?_
 
 ```
-* BeanFactory是spring中最基础的ioc容器
-
-* ApplicationContext继承自 BeanFactory, 实现了额外的功能
+没有关系, BeanFactory是IOC容器的顶级接口, FactoryBean是注册Bean的一种方式
 ```
 
 ## 2. Bean
 
-_什么是 Bean?_
+_Spring 有哪些方式可以获取 Bean 的注册信息?_
 
 ```
-被Spring IOC 容器管理的对象称为Bean
-```
+1. 读取配置文件
 
-_Spring 是如何获取一个 Bean 的依赖信息的?(Spring 如何注册一个 Bean?)_
-
-```
-1. 读取配置文件或通过反射(包扫描的方式)读取Bean的依赖信息为BeanDefinition
-
-2. 使用所有依赖信息构造BeanDefinitionRegistry
+2. 扫描特定包下的所有类, 通过反射读取注册信息
 
 tip: 使用@ComponentScan注解或在配置文件中添加<<context:component-scan>开启包扫描
 ```
 
-_BeanFactory 和 FactoryBean 两个接口的区别?_
-
-```
->> BeanFactory: 所有IOC容器的基接口, 提供基本的IOC功能
-
->> FactoryBean: 注册实现了该FactoryBean的类时, 会间接注册另一个Bean
-```
-
-_第三方包中的类如何注册为 Bean?_
-
-```
-* spring中使用FacotoryBean
-
-* springboot中使用@Bean注解
-```
-
-_Bean 的 Scope 有哪些?_
+_Bean 的 常用 Scope 有哪些?_
 
 ```
 >> singleton(默认scope): 每次从容器中获取的bean是同一个对象
@@ -68,52 +42,14 @@ _Bean 的 Scope 有哪些?_
 >> prototype: 每次从容器中获取的bean是新的对象
 ```
 
-## 3. Bean 的生命周期
-
 _讲一下 bean 的生命周期?_
 
 ```
-1. 通过反射调用构造函数实例化对象(Instantiation)
+1. 实例化(调用constructor方法)
 
 2. 依赖注入
 
-3. 初始化: 该阶段可以进行数据库连接等操作
-
-4. 使用和销毁
-```
-
-_如何在 BeanFacotry 实例化后执行回调?_
-
-```
-往容器中注册BeanFactoryPostProcessor的子类, 重写方法会被视作回调函数
-
-tip: 常见的应用是在回调中替换注册信息中的占位符, 例如PropertySourcesPlaceholderConfigurer
-```
-
-_Spring 提供了许多 XxxAware 接口, 这些接口作用是什么?_
-
-```
-用于特殊依赖的注入
-
-例如: BeanNameAware, BeanFactoryAware, ApplicationContextAware
-```
-
-_如何在 Bean 实例阶段和初始化阶段前后添加回调?_
-
-```
-* 实例化阶段
->> 实现InstantionAwareBeanPostProcessor中的两个方法
-
-* 初始化阶段
->> 实现BeanPostProcessor中的两个方法
-```
-
-_Bean 的 init 方法和 destory 方法会在什么时候执行?_
-
-```
-init()和destory()分别在使用Bean前后执行
-
-tip: 使用@PostConstruct 和 @PreDestory可以标注这个方法, 也可以在配置文件中配置
+3. 初始化, 使用, 销毁
 ```
 
 _懒加载和预加载 Bean 的区别?_
@@ -121,37 +57,35 @@ _懒加载和预加载 Bean 的区别?_
 ```
 Bean为懒加载时, 会在getBean()时才会开始生命周期, 预加载Bean则会在容器启动时就开始
 
-tip1: 默认为预加载, 使用@Lazy注解指定Bean懒加载
+tip: 默认为预加载, 使用@Lazy注解指定Bean懒加载
 ```
 
-## 4. ApplicationContext
-
-_ApplicationContext 除了作为 IOC 容器还有哪些功能?_
+_如何标注 Bean 的 init/destory 钩子方法?_
 
 ```
-* 资源加载
-applicationContext.getResource("url")
-
-* 国际化支持
-applicationContext.getMessage("key", null, Locale.CHINA)
-
-* 容器事件支持
->> 通过applicationContext.publishEvent()发布事件, 实现了ApplicationListener的Bean会监听事件
-
-tip1: 使用国际化支持时需要先往容器中注册MessageSource
-tip2: 可以使用注解@EventListener标注Bean的方法作为监听事件发生时的回调
-
+使用@PostConstruct 和 @PreDestory标注
 ```
 
-_JAVA SE 如何提供国际化支持?_
+_如何在容器启动后, 实例化阶段, 依赖注入阶段前后对 Bean 进行再加工?_
 
-```java
-// 使用ResourceBundle+配置文件实现
-ResourceBundle resourceBundle = ResourceBundle.getBundle("baseName", Locale.CHINA);
-resourceBundle.getString(key) // 返回baseName_zh_CN.properties文件中的键值对的值
+```
+往容器中注册下面的Bean:
+* BeanFactoryPostProcessor
+* InstantionAwareBeanPostProcessor
+* BeanPostProcessor
+
+tip: @Value中的通配符实现原理为在BeanFactoryPostProcessor修改Bean注册信息
 ```
 
-## 5. 基于注解的开发
+_如何将 IOC 容器对象注入为依赖?_
+
+```
+注入特殊的依赖可以让Bean实现XxxAware接口, 通过方法注入
+
+例如: BeanNameAware, ApplicationContextAware
+```
+
+## 3. 基于注解的开发
 
 _如何开启 Spring 的注解开发?_
 
@@ -180,10 +114,18 @@ _哪些 Spring 注解的作用是注册 Bean?_
 * 方法注解: @Bean
 ```
 
+_如何将配置文件中的配置注入为依赖?_
+
+```
+* @Value + 通配符
+
+* 使用@ConfigurationProperties
+```
+
 _Spring 中@Import 注解的作用?_
 
 ```
-当Spring扫描到Bean被@Import及其子注解标注时, 会注册Import注解参数中的类作为Bean
+Bean类如果被@Import标注, 会额外注册指定的类为Bean, 即使不在包扫描范围内
 
 tip: @Import常见的应用为@EnableXxx注解
 ```
@@ -428,223 +370,137 @@ TransactionStatus txStatus = transactionManager.getTransaction(txDef);
 
 ## 1. 框架原理
 
-**_Springmvc 基本组件有哪些, 各自的作用?_**
+_Springmvc 中的组件有哪些?_
 
 ![1673255572208](image/Spring/1673255572208.png)
 
 ```
-DispatherServlet: 是一个Servlet, 拦截了所有请求, 并统一分发给特定的Handler(HandlerAdpater将Controller适配为Handler)
-
-HandlerMapping: 负责请求到Handler的映射, 返回处理链(包含Handler和拦截器以及异常处理器)
-
-Handler: 处理请求并返回ModelAndView
-
-ViewResolver: 接受ModelAndView, 返回View, View的输出流写入响应体
+tip: springmvc基于tomcat, 所以Dispatcherservlet需要映射所有请求路径
 ```
 
-**_讲一下 Springmvc 处理链中的拦截器和异常解析器?_**
+_SpringMvc 中拦截器(HandlerInterceptor)可以在哪些时机拦截请求?_
 
 ```
-拦截器:  在Handler处理请求前,后以及视图渲染完这三个时刻进行拦截
+1.HandlerAdptor处理前
+2.HandlerAdptor处理后
+3.ViewResolver处理后
+```
 
-异常解析器: 处理器链中抛出了异常时异常解析器处理并返回默认的ModelAndView
+_SpringMvc 中如何统一处理 Controller 方法中抛出的异常?_
+
+```
+使用异常解析器(HandlerExceptionResolver)可以捕获异常并返回ModelAndView
 ```
 
 ![1689238009204](image/spring/1689238009204.png)
 
-## 2. 基于注解的开发
+## 2. 注解开发
 
 ### 4.2.1 Controller
 
-**_Controller 及其方法上常用的注解有哪些?_**
+_Handler 方法的返回类型是什么?_
 
 ```
->> @Controller @RestController(标注所有方法均为@ResponseBody方法)
-
->> @RequestMapping @GetMapping @PostMapping
-
->> @ResponseBody(标注方法返回值不用视图解析器解析, 直接走JackSon序列化器序列化为响应体)
+ModelAndView
 ```
 
-> 易踩坑点: Jackson 序列化对象时对象必须有 getter 方法
-
-**_没有被 `@ResponseBody`标注的方法的返回类型可以是什么?_**
+_怎样让 Handler 方法的返回对象直接序列化到 http 响应体中?_
 
 ```
->> ModelAndView Model View
+1. 使用@RestController
+2. 添加@ResponseBody
+```
 
->> String (视图名称)
+_RestController 默认使用哪个库进行序列化?_
+
+```
+默认使用JackSon进行序列化
+
+tip1: Jackson序列化时需要getter方法
+tip2: 通过WebMvcConfigurer添加HttpMessageConverter可以扩展序列化器
+```
+
+_如何将 Handler 方法和特定路径的请求绑定?_
+
+```
+使用@RequestMapping及子注解标记
 ```
 
 ### 4.2.2 传递参数和依赖
 
-**_Controller 的方法会自动注入依赖的参数类型有哪些?_**
+_Handler 方法的哪些参数类型会被自动注入?_
 
 ```
->> HttpServletRequest/HttpServletResponse/HttpSession/WebRequest: Servlet的请求响应类
+* HttpServletRequest/HttpServletResponse/InputStream/OutputStream: Servlet相关类
 
->> InputStream/OutputStream/Reader/Writer: 请求或响应IO流
+* ModelAndView: 要返回的ModelView对象
 
->> Map/ModelMap/ModelAndView: 要返回的ModelView对象
-
->> BindingResult: 注入参数被验证框架验证的结果
+* BindingResult: 注入和验证参数的结果
 ```
 
-**_query 参数/form 表单提交参数/multipart 参数如何绑定?_**
+_讲一下 Handler 方法的参数解析相关注解?_
 
 ```
-使用@RequestParam
+* @RequestParam: query参数, form参数,  multipart参数
+
+* @PathVariable: path参数
+
+* RequestBody: 请求体反序列化参数
 ```
 
-**_如何绑定路径参数?_**
+_如何自定义 Handler 方法的参数解析?_
 
 ```
-使用@PathVariable
-```
-
-**_请求体如何绑定为方法参数?_**
-
-```
-@RequestBody: 将请求体的JSON通过反序列化器映射为POJO
-```
-
-**_如何添加请求中不存在但需要的绑定参数?_**
-
-```
-实现HandlerMethodArgumentResolver子类, 并通过WebMvcConfigurer配置
+通过通过WebMvcConfigurer配置HandlerMethodArgumentResolver
 ```
 
 ## 3. MVC 配置
 
-> Tips: SpringMVC 的配置类需要继承自 WebMvcConfigurer)
-
-**_如何配置拦截器 `(HandlerInterceptor)`?_**
+_SpringMvc 的配置类需要实现什么接口?_
 
 ```
-重写配置类的addInterceptors()
+WebMvcConfigurer
+
+tip: WebMvcConfigurer可以配置拦截器, 异常解析器, 参数解析器, 跨域规则
 ```
 
-**_如何配置序列化器 `(HttpMessageConverters)`?_**
+_前端为 SPA 应用时, SpringMvc 如何配置 ResourceHandler?_
 
 ```
-注册类型为HttpMessageConverters的Bean
-```
-
-**_如何配置参数解析器(`ArgumentResolvers`), 参数解析器的作用?_**
-
-```
-重写配置类的addArgumentResolvers(), 参数解析器可以自定义Controller方法的参数绑定逻辑
-```
-
-**_如何配置静态资源处理器(ResourceHandler)?_**
-
-```
-重写配置类的addResourceHandlers()
-```
-
-> !!! 易踩坑点: 在通过前端路由实现的单页面应用中, 资源处理器应当:
->
-> -   对所有请求路径不匹配/static/\* 的请求, 返回 index.html;
-
-**_如何处理跨域问题?_**
-
-```
-浏览器根据同源策略, XHR请求中的域名如果和当前域名不同, 会拦截该跨域请求; 服务器默认也会拦截跨域请求(除非配置了允许的跨域)
-```
-
-解决方法:
-
-```
->> SpringMVC服务器通过配置类的addCorsMappings()方法配置服务器允许的跨域
-
->> 浏览器可以通过JsonP等技术绕开跨域限制, 也可以直接使用允许跨域的浏览器
+将大部分路径(/**)都映射到index.html, 如果有js或css需要单独配置
 ```
 
 # 5. SpringBoot
 
-## 1. springboot 介绍
+## 1. 介绍
 
--   springboot 基于 spring 框架, 采用"约定大于配置"的方式简化了 spring 的配置(自动配置第三方依赖只需要一个 `spring-boot-starter-Xxx` jar 包)
--   `spring-boot-starter-web` 采用内嵌 tomcat 服务器
--   一个 springboot 应用的程序入口如下
-
-```java
-@SpringBootApplication
-public class MyApplication {
-    public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(MysprApplication.class, args);
-}
-}
-```
-
-## 2. @SpringBootApplication
-
-**_springboot 自动配置原理?_**
-
-主启动类的注解 `@SpringBootApplication` 是一个组合注解, 其组成注解和作用包括
+_为什么要使用 Springboot?_
 
 ```
-@SpringBootConfiguration: 启动类会被当做一个配置类注册
-@ComponentScan: 进行包扫描, 注册bean(默认扫描启动类同包下的类)
-@EnableAutoConfiguration: @Import导入EnableAutoConfigurationImportSelector
+使用第三方库的xxx-starter.jar包时可以自动注册bean, 无需手动注册
+
+tip: springmvc的starter中使用内嵌web容器, 默认依赖库为spring-boot-starter-tomcat
 ```
 
-`EnableAutoConfigurationImportSelector` 这个类通过 `SpringFactoriesLoader`获取 `spring.factories` 文件中声明的配置类全类名列表, **并通过反射机制注册 bean 到容器中**
+## 2. 实现原理
 
-```java
-List<String> configurations = SpringFactoriesLoader.loadFactoryNames(this.getSpringFactoriesLoaderFactoryClass(), this.getBeanClassLoader());
-```
-
-> !!! 易踩坑点: jar 包中的配置类无法通过包扫描注册
-
-**_jar 包是什么, jar 包约定的目录结构是什么?_**
-
-一个普通 java 程序被打包后形成的文件称为 jar 包, 可以通过 `java Xxx.jar`直接执行
-
-jar 包约定目录结构
-
--   META-INF/
--   com/demo/...或资源文件夹
+_springboot 自动配置原理?_
 
 ```
-* META-INF下包含jar包元信息, 主要是清单文件（MANIFEST.MF），其中包含了关于JAR包的版本、作者、依赖等信息
-* ClassLoader.getResourceAsStream/loadClass默认起始路径为jar包的根路径
+使用了类似于Java SPI的机制:
+读取三方jar包中的spring.facotries文件, 加载中文件列出的配置类并注册到容器, 配置类被ConditionOnXxx注解, 只有在符合条件时才被注册
 ```
-
-使用 `springboot-maven-plugin`打包后的 jar 包, `org/...`下是 springboot 主程序, `BOOT-INF/lib`下包含依赖库的 jar 包使得打包后的 jar 包**可以直接独立运行**
-
-> 易踩坑点: 如果打包后的 jar 包不直接包含依赖库的 jar 包, 需要运行的主机上 "jvm 的 classpath 变量/环境变量 CLASSPATH " 对应的路径下有依赖的 jar 包
-
-![1689576469315](image/spring/1689576469315.png)
 
 ## 3. 配置文件
 
-**_springboot 如何导入配置文件中的属性值?_**
+_SpringBoot 如何导入额外的 yml 配置文件?_
 
-使用 `@PropertySource() `导入配置文件的所有属性, 使用 `@Value/@ConfigurationProperties(prefix = "")`注入
-
-```java
-@PropertySource("classpath:my_application.yml")
-@Configuration
-public class AppConfig {
-}
-
-//----------------------------------------
-
-    @Value("${myapp.property}")
-    private String myProperty;
-
-//----------------------------------------
-
-@Component
-@ConfigurationProperties(prefix = "myapp")
-// 如果这个类没有被@Component标记, 需要其他被注册的类
-// 标注@EnableConfigurationProperties({MyProperties.class})
-public class MyProperties {
-    private String property;
-}
+```
+在Bean上标注@PropertySource("db.yml")
 ```
 
-**_多配置文件如何设置?_**
+_多环境配置文件如何设置?_
 
-主配置文件 `application.yml`中设置 `spring.profiles.active: Xxx` 启用从配置文件 `application-Xxx.yml`
+```
+application.yml中设置spring.profiles.active: Xxx `启用从配置文件`application-Xxx.yml`
+```

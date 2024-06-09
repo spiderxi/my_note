@@ -45,8 +45,8 @@ _环境变量是什么?_
 ```
 环境变量是由操作系统维护的变量, 进程(如jvm, shell)可以读写环境变量
 
-tip1: windows的powershell中使用 %PATH%
-tip2: linux的shell中使用 $PATH
+tip1: windows的powershell中使用 %env:PATH
+tip2: linux的bash中使用 $PATH
 tip3: 环境变量PATH使得我们可以在shell中直接启动程序而不用到对应工作目录
 ```
 

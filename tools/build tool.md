@@ -15,9 +15,9 @@ _为什么你使用 Maven?_
 
 _怎样理解 Maven 中的约定大于配置(Convention Over Configuration)?_
 
-maven 中的属性都有默认值(在 super pom 中可以查看), 下面是常用的默认值:
-
-![1696733941119](image/build-tool/1696733941119.png)
+```
+maven程序中的属性(System.getProperty() + 应用属性)都有默认值, 可以在super pom 中可以查看
+```
 
 _怎样统一个项目中所有人员使用的 maven 版本?_
 
@@ -51,16 +51,13 @@ _讲一下 POM 的继承体系?_
 tips: 子项目中有<parent>, 父项目中<package>pom<package> 并且有<modules>
 ```
 
-_插件中的 goals 和 phase 是什么?_
+_maven 插件中的 goal 是什么_
 
 ```
->> goals指插件内部的指令, 一个插件可能有多个goals
+一个goal对应插件的一个指令, 在<execution>标签中绑定phase和插件goal
 
-
->> 可以在<execution>标签中绑定phase和部分goals, 绑定的goals会在该阶段执行
-
-tip1: 使用mvn <phase>可以按顺序依次执行到指定阶段
-tip2: 可以直接使用mvn <plugin>:<goal>执行插件内部指令
+tip1: 使用mvn <phase>可以按顺序执行到阶段
+tip2: 使用mvn <plugin>:<goal>可以按顺序执行到goal
 tip3: maven插件本质也是一个jar包, 因为maven运行在jvm中
 ```
 
@@ -84,27 +81,28 @@ _profile 的作用?_
 profile标签中的配置只有在满足profile的条件时才会生效
 ```
 
-> 当多个 profile 同时生效时, 会合并 profile
-
 ## 3. 依赖管理
 
-_依赖常用的 `<scope>` 有哪些?_
+_maven 中依赖项的 `<scope>` 有哪些?_
 
 ```
-* complie/默认: (会放入打包后的jar中)
+* complie(默认): 会打包到jar包中
 
-* test: 测试代码需要的依赖(不会放入打包后的jar中)
+* test: 仅用于测试, 不会打包到jar包中, 如Junit
 
-* optional: 无依赖传递性的依赖(避免依赖冲突)
+* provided: 运行环境自动提供, 仅用于编译, 不会被打包到jar包中, 如Servlet
 
-* provided: 由运行环境提供的依赖(不会放入打包后的jar中)
+* runtime: 编译不需要, 仅用于运行, 会被打包到jar包中, 如Mysql-Connector-J
 
+* import: <dependencyManagement>中用于导入其他项目的dependencyManagement
+
+* optional: 该依赖无传递性
 ```
 
 _版本号 `1.0-SNAPSHOT` 中的 SNAPSHOT 有什么含义?_
 
 ```
-maven在每次编译时, 会尝试获取并使用最新子版本
+maven在每次编译时会尝试获取并使用最新子版本
 ```
 
 _什么是依赖冲突, 如何解决?_
@@ -112,17 +110,7 @@ _什么是依赖冲突, 如何解决?_
 ```
 两个版本的依赖都存在时, maven可能会选择低版本的依赖, 导致不能使用高版本特性
 
-tip: 解决方法为使用<dependancyManagement>锁定高版本
-```
-
-_maven 查找依赖时遍历代码仓库的顺序是什么?_
-
-`local repository  =>  mirror 镜像仓库  =>  remote repositroy(默认包含central仓库: https://mvnrepository.com/)`
-
-_maven offline 模式是什么?_
-
-```
-maven查找依赖时仅仅在本地仓库查找
+tip: 解决方法为使用<dependancyManagement>锁定高版本或使用optional scope
 ```
 
 # 2. Gradle
