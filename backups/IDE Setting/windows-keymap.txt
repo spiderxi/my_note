@@ -1,0 +1,30 @@
+ctrl+c     |  copy
+ctrl+s     |  save
+ctrl+x     |  cut
+ctrl+v     |  paste
+ctrl+r     |  replace
+ctrl+f     |  find
+ctrl+z     |  undo
+ctrl+shift+z |  redo
+
+ctrl+j     |  Left
+ctrl+k     |  Right
+ctrl+i     |  Up
+ctrl+m     |  Down
+ctrl+h     |  Move caret To line head
+ctrl+;     |  Move caret To line end
+ctrl+u | move caret to previous word with selection
+ctrl+o | move caret to next word with selection
+alt+↓/↑    |  move line up/down
+alt+shift+↓|  duplicate line
+ctrl+backspace | delete line
+alt+s      |  reformat file
+ctrl + /   |  Comment With Line Comment
+ctrl+点击  |  Go To Declaration Or Usage
+ctrl+e     |  Next highlighted Error
+ctrl+q     |  Find in File
+ctrl+p     |  Search EveryWhere
+alt+h      |  type hierarchy
+alt+←/→    |  Back/Forward
+alt+enter   | show quick fix
+alt+r      | refactor this
