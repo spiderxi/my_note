@@ -28,3 +28,5 @@ alt+h      |  type hierarchy
 alt+←/→    |  Back/Forward
 alt+enter   | show quick fix
 alt+r      | refactor this
+alt+p      | show ai advice
+(shift) +f5 | run(debug)
