@@ -15,8 +15,8 @@ ctrl+h     |  Move caret To line head
 ctrl+;     |  Move caret To line end
 ctrl+u | move caret to previous word with selection
 ctrl+o | move caret to next word with selection
-alt+↓/↑    |  move line up/down
-alt+shift+↓|  duplicate line
+alt+↓/↑; alt+ctrl+i/m    |  move line up/down
+alt+shift+⬇️; ctrl+d |  duplicate line
 ctrl+backspace | delete line
 alt+s      |  reformat file
 ctrl + /   |  Comment With Line Comment
@@ -27,6 +27,7 @@ ctrl+p     |  Search EveryWhere
 alt+h      |  type hierarchy
 alt+←/→    |  Back/Forward
 alt+enter   | show quick fix
-alt+r      | refactor this
 alt+p      | show ai advice
+
+alt+r      | refactor this
 (shift) +f5 | run(debug)
