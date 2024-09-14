@@ -45,9 +45,9 @@ _环境变量是什么?_
 ```
 环境变量是由操作系统维护的变量, 进程(如jvm, shell)可以读写环境变量
 
-tip1: windows的powershell中使用 %env:PATH
-tip2: linux的bash中使用 $PATH
-tip3: 环境变量PATH使得我们可以在shell中直接启动程序而不用到对应工作目录
+tip: linux的bash中使用 $PATH
+tip: 环境变量PATH使得我们可以在shell中直接启动程序而不用到对应工作目录
+tip: 常见的环境变量有
 ```
 
 _win 和 linux 系统如何管理软件的安装和卸载?_
@@ -80,7 +80,7 @@ _常见开源协议的特点?_
 
 # 2. 代码常识
 
-## 1. Regular 表达式
+## 1. ReguExp
 
 _如何匹配数字/字符串开始/字符串结束/单词边界/空白符/非空白符/任意字符?_
 
@@ -151,6 +151,34 @@ _Apache Ant 风格的路径匹配规则是怎样的?_
 
 
 >> 使用**匹配包含路径分隔符"/"的字符串
+```
+
+## 4. MIME
+
+_MIME 文件类型由哪三部分组成?_
+
+```
+type/subtype; param1=value1; param2=value2
+```
+
+_HTTP 请求/响应头中哪个字段使用了 MIME 类型?_
+
+```
+Content-Type: text/plain; charset=UTF-8
+```
+
+_MIME 类型为 multipart/form-data 的请求一般会在什么情况下发起?_
+
+```
+提交表单<form>时, 使用"--BoundaryString"分隔多个参数
+
+tip: 文件也可以作为表单中的一个参数
+```
+
+_如何设置 Http 响应头让浏览器将响应体下载为附件?_
+
+```
+Content-Disposition: attachment; filename="demo.pdf"
 ```
 
 # 3. 生活常识
