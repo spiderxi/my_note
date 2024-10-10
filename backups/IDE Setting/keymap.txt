@@ -29,4 +29,9 @@ alt+←/→    |  Back/Forward
 alt+enter   | show quick fix
 ctrl + enter  | accept ai tool advice
 alt+r      | refactor this
+
+
 (shift) +f5 | run(debug)
+f8/f9 | setp over / resume program
+ctrl+5 | debug window
+ctrl + t | terminalß

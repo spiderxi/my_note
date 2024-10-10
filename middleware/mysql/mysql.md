@@ -1,29 +1,31 @@
-# 1. mysql 简介
+# 1. MySQL 简介
 
 ## 1. 关系型数据库理论
 
-**_关系型数据库的约束类型有哪些?_**
+**_(constraint)类型有哪些?_**
 
 ```
-主键约束Primary Key
-非空约束Not Null
-唯一约束Unique
-外键约束Foreign Key
-默认约束Default
-检查约束Check
+* 主键约束Primary Key
+* 非空约束Not Null
+* 唯一约束Unique
+* 外键约束Foreign Key
+* 默认约束Default
+* 检查约束Check
 ```
 
-**_关系型数据库的三范式指的是什么, 必须要遵循三范式吗?_**
+**_关系型数据库的三范式指的是什么?_**
 
 ```
-1NF: 属性是原子的
-2NF: 非主键完全依赖于主键
-3NF: 非主键之间不存在传递性依赖
+1NF: 字段是原子的
+2NF: 只有一个主键
+3NF: 字段之间不存在传递性依赖, 都必须直接依赖主键
+
+tip: 有时不一定严格遵循三范式, 为了加快查询速度存储冗余数据
 ```
 
-**_什么是视图, 什么是存储过程?_**
+**_什么是视图(View)?_**
 
-视图是使用 QL 语句定义的一张逻辑上的表, 没有物理表对应
+视图是使用 SQL 查询语句定义的一张逻辑上的表
 
 ```sql
 -- 创建视图
@@ -31,7 +33,9 @@ CREATE VIEW view_name AS
 SELECT * FROM table WHERE ...
 ```
 
-存储过程相当于一个数据库的函数
+**_什么是存储过程(Stroed Procudure)?_**
+
+一个存储过程相当于存储在数据库的一个函数
 
 ```sql
 -- 创建存储过程
@@ -43,33 +47,97 @@ BEGIN
 END;
 ```
 
-**_内连接, 左外连接, 全外连接的区别?_**
+## 2. SQL 查询
 
-内连接和外连接的区别: 外连接中, 即使一张表中有一条行记录匹配不到另一张表中的任何一行, 也会保留一条值为 null 的连接记录
+**_DDL/DML/DQL/DCL 的区别?_**
 
-左外连接至少保留左边的表中的一行, 全外连接左表和右表都至少保留一行
+```
+* DDL(Database define language): 如create/drop/alter table
 
-**_count(`_`**)**和 count(1)和 count(字段)的区别?\***
+* DML(Database manipulate language): 如insert/delete/update table
 
-count(字段)当字段为 null 时不会计数
+* DQL(Datebase query language): 如select table
 
-count(_)和 count(1)都可以统计行数, 但一般来说存储引擎会对 count(`_`)进行性能上的优化
+* DCL(Datebase control language): 如commit/rollback grant/revoke
+```
+
+**_SELECT 语句的语法?_**
+
+```sql
+/* 普通查询 */
+SELECT a,b,c
+FROM table
+WHERE a>1 AND b>2
+ORDER BY a ASC,b DESC
+LIMIT 0,10
+
+/* 聚合查询 */
+SELECT a,count(*)
+FROM table
+WHERE b > 0
+GROUP BY a
+HAVING a != 1
+```
+
+**_内连接/外连接/全外连接的区别?_**
+
+```
+* 内连接: 行A和行B符合连接条件 => 行A-行B
+
+* 左外连接: 行A与任何行都不符合连接条件 => 行A-NULL
+
+* 右外连接: 任何行与行B都不符合连接条件 => NULL-行B
+
+* 全外连接: 左外连接+右外连接
+```
+
+**_count(🌟)/count(1)/count(字段)的区别?_**
+
+```
+>> count(*)和count(1)都可以统计总行数, 但数据库一般只对count(*)有性能优化
+
+>> count(字段A)只统计字段A NOT NULL的行的数量
+```
+
+**_深分页为什么慢?_**
+
+```sql
+SELECT * FROM user ORDER BY ctime LIMIT 1000000,10
+上面的这行SQL会先查二级索引"ctime", 会先遍历前1000000行记录!
+```
 
 **_深分页问题如何解决?_**
 
--   使用缓存, 将分页查询结果缓存
--   使用一个游标字段, 字段值随分页增加递增, 每次获取前一页的最后一个值 X, 用来作为条件>X 从而实现走索引
+```sql
+游标法, 上面的SQL可以改为:
+SELECT * FROM user WHERE ctime > 上次查询结果最大的ctime ORDER BY ctime LIMIT 10
 
-**_drop truncate delete 的区别?_**
+tip: 需要和产品沟通, 让用户使用瀑布流的方式浏览记录
+```
 
--   delete 遵循事务机制(其他两个不是事务), 作用是条件删除表的记录
--   drop 直接删除表(包括表的结构), truncate 删除表所有记录, 不删除表
+**_drop/truncate/delete 的区别?_**
+
+```
+* drop: 删除表的数据和元信息, 不可恢复
+* truncate: 删除表的数据, 不可恢复
+* delete: 满足条件的行, 可恢复
+```
 
 **_union 和 union all 的区别?_**
 
-union 会去重, union all 不会
+```
+union合并两个集合时会去重, union all不会;
+```
 
-## 2. mysql server 架构
+**_字符集 utfmb3 和 utfmb4 的区别?_**
+
+```
+* uftmb3是uft8的子集, 单个字符最大编码长度为3byte, 不支持表情字符
+
+* uftmb4是完整的uft8, 单个字符最大编码长度为4byte, 支持表情字符
+```
+
+## 3. MySQL Server
 
 **_mysql 服务器采用分层架构, 具体怎么分的?_**
 
@@ -83,7 +151,17 @@ union 会去重, union all 不会
 
 ![1691131088320](image/mysql/1691131088320.png)
 
-## 3. 存储引擎
+**_如何对 mysql 服务器进行个性化设置?_**
+
+通过设置系统变量来对服务器进行设置, 系统变量可以通过配置文件设置, 也可以通过指令 `SET GLOBAL 变量名 = 值`设置
+
+可以通过 `SHOW VARIABLES LIKE 'xxx'` 查看系统变量的值
+
+**_如何查看 mysql 服务器运行状态?_**
+
+通过指令查看状态变量 `SHOW STATUS LIKE 'xxx'`
+
+## 4. 存储引擎
 
 **_常用的存储引擎有哪些, 它们之间有哪些区别?_**
 
@@ -109,24 +187,6 @@ CREATE TABLE table_name(
  ...
 ) ENGINE = InnoDB
 ```
-
-## 4. mysql server 调控
-
-**_如何对 mysql 服务器进行个性化设置?_**
-
-通过设置系统变量来对服务器进行设置, 系统变量可以通过配置文件设置, 也可以通过指令 `SET GLOBAL 变量名 = 值`设置
-
-可以通过 `SHOW VARIABLES LIKE 'xxx'` 查看系统变量的值
-
-**_如何查看 mysql 服务器运行状态?_**
-
-通过指令查看状态变量 `SHOW STATUS LIKE 'xxx'`
-
-**_表的字符集使用 utfmb3 和 utfmb4 有什么区别?_**
-
-uftmb3 是 utf-8 的子集, 最大字符编码长度为 3 字节, **不包含表情符号**
-
-utfmb4 是完整的 utf-8 编码
 
 # 2. Innodb
 
@@ -170,26 +230,43 @@ utfmb4 是完整的 utf-8 编码
 
 ## 3. 索引
 
-**_Innodb 为什么使用 B+树作为索引, 而不使用 B 树, AVL?_**
-
--   B+树相较于 B 树支持范围查找(叶节点使用双向链表连接)
--   B+树相较于 AVL 来说, 树的高度更小, 磁盘 IO 的次数更少
-
-**_索引的分类有哪些?, 什么是回表?_**
+**_Innodb 为什么使用 B+树作为索引, 而不使用 B 树/AVL?_**
 
 ```
-* 聚簇索引: 完整的记录在B+树索引的叶节点上
-* 二级索引: 索引的叶节点只保存记录的主键, 如果需要查找完整的记录需要回到聚簇索引中查找(回表)
-* 联合索引: 多个字段按照字典序排序, 构成一个索引
+B树/AVL在范围查询时不支持索引
+```
+
+**_什么是聚簇索引/二级索引/联合索引?_**
+
+```
+* 聚簇索引(clustered index): 以id建立的索引, 叶节点存储全部字段
+
+* 二级索引(secondary index): 以字段A排序的索引, 叶节点存储(A, id)
+
+* 联合索引: 以多个字段(A, B)排序的索引, 叶节点存储(A, B, id)
+```
+
+**_什么是回表?_**
+
+```
+"select * from table where ctime > 10"执行时会:
+1. 查二级索引"ctime"获取id
+2. 按id查询聚簇索引获取全部字段(回表)
+
+tip: 如果在第1步就能获取到select中的全部字段(覆盖索引)则不用回表
 ```
 
 **_什么是最左匹配原则?_**
 
-要使用联合索引, 作为条件的字段必须覆盖联合索引的左前缀
+```
+要使用联合索引, 作为查询条件的字段必须覆盖联合索引的左前缀
+```
 
-**_索引 B+树为什么高度一般不超过 3 层?_**
+**_索引 B+树为什么高度一般不会超过 3 层?_**
 
-页的大小为 16KB, 假设一个页存储 1000 条记录, 3 层能够存储 10^9 条记录, 这个数量一般来说已经足够
+```
+一个页大小为16KB可以存储约1000条记录, 3层的B+树可以存储10^6条记录
+```
 
 **_索引什么情况下会失效?_**
 
@@ -206,7 +283,9 @@ utfmb4 是完整的 utf-8 编码
 
 **_为什么建议使用自增主键?_**
 
-避免新增记录导致的频繁的**页分裂**
+```
+在插入数据时使用自增主键可以减少聚簇索引的页分裂
+```
 
 # 3. 事务和锁
 
@@ -291,27 +370,27 @@ _为什么有了 redo log 还需要 undo log?_
 
 ## 1. Explain
 
-**_EXPLAIN 可以做什么? 结果中重要的列有哪些?_**
+**_EXPLAIN 可以做什么?_**
 
-explain+DQL 语句可以查看执行计划, 执行计划中重要的字段:
+Explain+DQL 语句可以查看执行计划, 执行计划中重要的字段有:
 
 ```
-* key: 使用到的索引
 * type: 查询方式
-* key_len: 使用到的索引的长度
-* rows: 预估行数
-* Extra: 有助于查询优化的额外信息
-* table: 查询的哪个表
+* key: 使用到的索引
+* rows: 预估需要扫描行数
+* filtered: WHERE子句过滤了行数占比(%)
+
+tip: 使用explain只能查看执行计划, 并没有实际执行SQL!
 ```
 
-**_type 有哪些?_**
+**_查询方式有哪些?_**
 
 ```
-* 全表扫描: ALL
-* 索引全扫描: Index
-* 索引范围扫描: Range
-* 索引的等值查询: eq_ref
-* 不适用索引页不扫描表: NULL
+* 全表遍历: all
+* 索引上全量遍历: index
+* 索引范围扫描: range
+* 索引的等值查询: ref
+* 直接查系统表: system/const
 ```
 
 ## 2. 分库分表

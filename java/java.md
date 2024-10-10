@@ -454,7 +454,7 @@ ConcurrentHashmap的锁粒度小:
 equals默认实现为==, ==比较两个Object是否为同一个引用
 ```
 
-**_为什么重写 `equals()`必须要重写 `hashcode()`?_**
+**_为什么重写 `equals()`必须要重写 `hashcode()`(反之亦然)?_**
 
 ```
 重写hashcode的是为了符合hash函数的定义(相同对象的hash值必须相等)
