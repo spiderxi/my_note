@@ -17,13 +17,12 @@ ctrl+u | move caret to previous word with selection
 ctrl+o | move caret to next word with selection
 alt+↓/↑; |  move line up/down
 alt+shift+⬇️|  duplicate line
-ctrl+backspace | delete line
 alt+s      |  reformat file
 ctrl + /   |  Comment With Line Comment
 ctrl+点击  |  Go To Declaration Or Usage
 ctrl+e     |  Next highlighted Error
 ctrl+p     |  Search EveryWhere
-shift+shift |
+shift+shift/f1 | find file
 alt+h      |  type hierarchy
 alt+←/→    |  Back/Forward
 alt+enter   | show quick fix
@@ -32,6 +31,4 @@ alt+r      | refactor this
 
 
 (shift) +f5 | run(debug)
-f8/f9 | setp over / resume program
-ctrl+5 | debug window
-ctrl + t | terminalß
+ctrl + t | terminal
