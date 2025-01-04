@@ -124,12 +124,12 @@ _**Meckito 框架的最大优点?**_
 
 **_lombok 中常用的注解有哪些?_**
 
-| 注解                    | 说明               |
-| ----------------------- | ------------------ |
+| 注解                          | 说明               |
+| ----------------------------- | ------------------ |
 | **@Getter**             |                    |
 | **@Setter**             |                    |
-| @ToString               |                    |
-| @EqualsAndHashCode      |                    |
+| @ToString                     |                    |
+| @EqualsAndHashCode            |                    |
 | **@XxxArgsConstructor** |                    |
 | **@Data**               |                    |
 | **@Builder**            | 支持链式调用初始化 |
@@ -199,6 +199,8 @@ git remote  add  <远程仓库名称例如origin>  <远程仓库URL>
 git rebase --abort
 
 git config --global user.name "用户名"
+git config --global user.email "none@email.com"
+git config --global http.proxy "http://localhost:7890"
 ```
 
 **_常用的开发分支?_**
