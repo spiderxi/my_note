@@ -4,8 +4,8 @@
 
 **_什么是 JDK & JRE ?_**
 
--   `JDK(java development kit) = JRE + Java开发工具(例如javac, javadoc)`
--   `JRE(java runtime enviroment) = 基于平台的JVM程序 + 动态链接文件 + 标准库class/jar文件 + 平台特有的class/jar 文件`
+- `JDK(java development kit) = JRE + Java开发工具(例如javac, javadoc)`
+- `JRE(java runtime enviroment) = 基于平台的JVM程序 + 动态链接文件 + 标准库class/jar文件 + 平台特有的class/jar 文件`
 
 **_什么是 OpenJDK?_**
 
@@ -15,8 +15,8 @@
 
 **_什么是 jar & war?_**
 
--   `jar(Java Archive) 是Java应用程序的压缩包 (包含class文件, resource文件, META-INF/文件下的元信息)`
--   `war 是 Java网络应用的压缩包 (额外包含/WEB-INF下的网络应用元信息和网络应用静态资源)`
+- `jar(Java Archive) 是Java应用程序的压缩包 (包含class文件, resource文件, META-INF/文件下的元信息)`
+- `war 是 Java网络应用的压缩包 (额外包含/WEB-INF下的网络应用元信息和网络应用静态资源)`
 
 **_什么是 classpath?_**
 
@@ -55,22 +55,22 @@ Tip2: classpath默认包含JAVA_HOME/lib/*.jar和Main.jar
 
 **_JDK LTS 版本有哪些, 各自主要特性是什么?_**
 
-| JDK | 主要特性                                 |
-| --- | ---------------------------------------- |
+| JDK | 主要特性                                  |
+| --- | ------------------------------------- |
 | 8   | stream API, lambda 表达式, LocalDate API |
-| 17  | zgc, seal 类, switch+lambda              |
-| 21  | 虚拟线程                                 |
+| 17  | zgc, seal 类, switch+lambda            |
+| 21  | 虚拟线程                                  |
 
 ## 4. 语言概述
 
 **_Java 和 CPP 的区别?_**
 
-| Java             | cpp                          |
-| ---------------- | ---------------------------- |
-| **纯面向对象**   | 可以面向对象, 也可以面向过程 |
-| **自动垃圾回收** | 使用 delete 手动回收垃圾     |
-| 单继承+接口      | 多继承                       |
-| **跨平台**       | 不跨平台                     |
+| Java       | cpp              |
+| ---------- | ---------------- |
+| **纯面向对象**  | 可以面向对象, 也可以面向过程  |
+| **自动垃圾回收** | 使用 delete 手动回收垃圾 |
+| 单继承+接口     | 多继承              |
+| **跨平台**    | 不跨平台             |
 
 # 2. Java 语言特性
 
@@ -112,13 +112,13 @@ Tip2: classpath默认包含JAVA_HOME/lib/*.jar和Main.jar
 
 相同点
 
--   两者都不能被实例化
+- 两者都不能被实例化
 
 不同点
 
--   变量方面, 接口中所有变量为 `public static final`, 抽象类无限制
--   方法方面, 接口中所有方法为 `public abstract`, 抽象类无限制(可以包含 `abstract ` 方法)
--   构造器方面, 接口不能声明构造函数, **抽象类无限制**
+- 变量方面, 接口中所有变量为 `public static final`, 抽象类无限制
+- 方法方面, 接口中所有方法为 `public abstract`, 抽象类无限制(可以包含 `abstract ` 方法)
+- 构造器方面, 接口不能声明构造函数, **抽象类无限制**
 
 ## 2. 注解与反射
 
@@ -126,20 +126,20 @@ Tip2: classpath默认包含JAVA_HOME/lib/*.jar和Main.jar
 
 重要的元注解如下:
 
-| 注解名            | 作用                                                                                                                                                   |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| @Override         | 标记重写方法                                                                                                                                           |
-| @Deprecated       | 标记过时方法                                                                                                                                           |
-| @SuppressWarnings | 忽略编译器警告                                                                                                                                         |
+| 注解名               | 作用                                                                                                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| @Override         | 标记重写方法                                                                                                                       |
+| @Deprecated       | 标记过时方法                                                                                                                       |
+| @SuppressWarnings | 忽略编译器警告                                                                                                                      |
 | **@Retention**    | **注解的保留策略**<br />**RetentionPolicy.SOURCE(只在源码中保留)<br />RetentionPolicy.CLASS(保留到编译期)<br />RetentionPolicy.RUNTIME(保留到运行时)** |
-|                   |                                                                                                                                                        |
-| **@Target**       | **注解用在什么地方**<br />ElementType.FIELD<br />ElementType.METHOD<br />ElementType.TYPE                                                              |
-| **@Inherited**    | **注解是否会由父类传递给子类**                                                                                                                         |
+|                   |                                                                                                                              |
+| **@Target**       | **注解用在什么地方**<br />ElementType.FIELD<br />ElementType.METHOD<br />ElementType.TYPE                                            |
+| **@Inherited**    | **注解是否会由父类传递给子类**                                                                                                            |
 
 **_编译期注解和运行期注解分别是如何生效的?_**
 
--   编译期注解通过 `AbstractProcessor` 生效, `AbstractProcessor` 中可以修改语法书
--   运行期注解通过反射 `Class#getAnnotations()` 生效
+- 编译期注解通过 `AbstractProcessor` 生效, `AbstractProcessor` 中可以修改语法书
+- 运行期注解通过反射 `Class#getAnnotations()` 生效
 
 **_Java 中反射是什么, 反射为什么慢?_**
 
@@ -416,8 +416,8 @@ ConcurrentHashmap的锁粒度小:
 * get()不加锁
 
 * put()时, 最多只锁一个桶, 不会锁整个对象
-	- 映射的桶为空时, 尝试cas
-	- 映射的桶不为空时, 才获取对象锁
+    - 映射的桶为空时, 尝试cas
+    - 映射的桶不为空时, 才获取对象锁
 ```
 
 ## 5. 阻塞队列
@@ -505,24 +505,24 @@ tip2: 使用String#intern()方法本质上是在用时间换空间
 
 **_Java 中的基本类型有哪些, 对应的包装类是什么, 各种类型的长度是多少?_**
 
-| 基本类型 | 包装类  | 基本类型的长度(byte) | 字面值             |
-| -------- | ------- | -------------------- | ------------------ |
-| boolean  | Boolean | 依赖于 JVM 实现      |                    |
-| byte     | Byte    | 1                    |                    |
-| char     | Char    | 2                    |                    |
-| short    | Short   | 2                    |                    |
-| int      | Integer | 4                    |                    |
-| float    | Float   | 4                    | `float f = 12.2F;` |
-| double   | Double  | 8                    | `double d = 12.2D` |
-| long     | Long    | 8                    | `long l = 12L;`    |
+| 基本类型    | 包装类     | 基本类型的长度(byte) | 字面值                |
+| ------- | ------- | ------------- | ------------------ |
+| boolean | Boolean | 依赖于 JVM 实现    |                    |
+| byte    | Byte    | 1             |                    |
+| char    | Char    | 2             |                    |
+| short   | Short   | 2             |                    |
+| int     | Integer | 4             |                    |
+| float   | Float   | 4             | `float f = 12.2F;` |
+| double  | Double  | 8             | `double d = 12.2D` |
+| long    | Long    | 8             | `long l = 12L;`    |
 
 **_什么是自动装箱/自动拆箱?_**
 
 ```
 * 自动装箱
-	"Integer i = 1"  被编译为 "Integer i = Integer.valueOf(1)"
+    "Integer i = 1"  被编译为 "Integer i = Integer.valueOf(1)"
 * 自动拆箱
-	"int i = new Integer(1)" 被编译为 "int i = new Integer(1).intValue()"
+    "int i = new Integer(1)" 被编译为 "int i = new Integer(1).intValue()"
 ```
 
 **_为什么 `new Integer(11) == new Integer(11)`?_**

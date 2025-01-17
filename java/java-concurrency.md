@@ -171,7 +171,7 @@ new ->(start函数) ready ->(被调度) running
 
 ***Java中如何保证线程安全?***
 
-java中使用**synchornized/lock/volatile**等机制保障原子性, 可见性, 有序性,   从而保障线程安全
+java中使用**synchronized/lock/volatile**等机制保障原子性, 可见性, 有序性,   从而保障线程安全
 
 ***Java中多线程协作的API有哪些?***
 
@@ -187,7 +187,7 @@ JUC提供的同步工具类 CountDownLatch CyclicBarrier Semaphore
 
 ***如何实现一个生产者消费者模式的两个线程?***
 
-使用synchornized+List+notifyAll + wait实现
+使用synchronized+List+notifyAll + wait实现
 
 ## 3. JMM
 
@@ -230,9 +230,9 @@ LoadStore
 StoreLoad
 ```
 
-## 5. Synchornized
+## 5. Synchronized
 
-***synchornized如何使用?***
+***synchronized如何使用?***
 
 修饰静态方法时锁对象为Class对象, 修饰成员方法时锁对象为 this, 同步代码块中可以自己指定锁对象
 
@@ -244,9 +244,9 @@ StoreLoad
                 }
 ```
 
-***synchornized的作用, 原理是什么?***
+***synchronized的作用, 原理是什么?***
 
-synchornized等价于在同步代码块前后添加了**内存屏障和两条指令** `monitorEnter/ monitorExit`, 这两条指令操作的是的 `对象头中的Markword的锁指针指向的ObjectMonitor`
+synchronized等价于在同步代码块前后添加了**内存屏障和两条指令** `monitorEnter/ monitorExit`, 这两条指令操作的是的 `对象头中的Markword的锁指针指向的ObjectMonitor`
 
 ```Java
 monitorEnter
@@ -260,7 +260,7 @@ ObjectMonitor保存了竞争锁的线程集合Entry Set, 当前持有线程和�
 
 ![1692086023645](image/java并发/1692086023645.png)
 
-***synchornized锁升级过程是怎样的?***
+***synchronized锁升级过程是怎样的?***
 
 ```
 无锁 -> 偏向锁 -> 轻量级锁 -> 重量级锁
@@ -298,7 +298,7 @@ ABA问题无法确保数据在锁定期间被写入, 只能保障数据和期望
 
 ## 1. Lock&Condition
 
-***Lock和Synchornized的区别有哪些?***
+***Lock和Synchronized的区别有哪些?***
 
 ```
 * Lock可以是公平锁,  Synchornized只能是非公平锁
