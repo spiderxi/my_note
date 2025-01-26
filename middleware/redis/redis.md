@@ -325,7 +325,7 @@ Zookeeper: 安全性更好(Redis主从是异步复制, 可能导致锁失效; Zo
 
 ***如何使用Redis实现排行榜?***
 ```
-使用sorted set, key=score, value=uid
+使用ZSet: key=score, value=uid
 ```
 
 ***如何Redis实现集群限流?***
@@ -346,7 +346,15 @@ Guava中的限流器原理为 TokenNum = Min(MaxTokenNum, lastNum + rate * (nowT
 使用bitmap和多个hash函数
 ```
 
-***大key set/list如何删除?***
+***什么是Large Key?***
 ```
-对于value占用内存特别大的键值对, 需要分批次删除, 避免一次性删除导致redis阻塞请求
+Large Key:
+🌟String类型的key, value过大(一般认为>100KB就过大, Redis系统级别限制了最大大小512MB, 超过会报错)
+🌟hash/set/list/zset元素过多
+
+❓Large Key会有什么问题? 
+👄Large Key操作耗时长会导致后续指令阻塞时间过长
+
+❓如何删除Large Key集合?
+👄删除集合时要对元素时要分批删除(Redis中集合删除元素的复杂度为O(N)), 或使用UNLINK指令
 ```
