@@ -12,6 +12,7 @@ alt+shift+⬇️|  duplicate line
 alt+s      |  reformat file
 ctrl + /   |  Comment With Line Comment
 alt+←/→    |  Back/Forward
+ctrl+b     |  toggle primary side bar visiability
 
 ctrl+j     |  Left
 ctrl+u | move caret to previous word with selection
@@ -31,7 +32,7 @@ alt+h      |  type hierarchy
 alt+enter   | show quick fix
 f6      | refactor
 ctrl + enter  | accept ai tool advice
-
 (shift) +f5 | run(debug)
 ctrl + t | toggle terminal
-ctrl + b | recent file
+ctrl + n | recent file
+f4       | select in(only jetbrains)
