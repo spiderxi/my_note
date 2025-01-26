@@ -4,31 +4,34 @@ ctrl+x     |  cut
 ctrl+v     |  paste
 ctrl+r     |  replace
 ctrl+f     |  find
+ctrl+a     |  select all
 ctrl+z     |  undo
 ctrl+shift+z |  redo
-
-ctrl+j     |  Left
-ctrl+k     |  Right
-ctrl+i     |  Up
-ctrl+m     |  Down
-ctrl+h     |  Move caret To line head
-ctrl+;     |  Move caret To line end
-ctrl+u | move caret to previous word with selection
-ctrl+o | move caret to next word with selection
 alt+↓/↑; |  move line up/down
 alt+shift+⬇️|  duplicate line
 alt+s      |  reformat file
 ctrl + /   |  Comment With Line Comment
-ctrl+点击  |  Go To Declaration Or Usage
+alt+←/→    |  Back/Forward
+
+ctrl+j     |  Left
+ctrl+u | move caret to previous word with selection
+ctrl+k     |  Right
+ctrl+o | move caret to next word with selection
+ctrl+i     |  Up
+ctrl+m     |  Down
+ctrl+h     |  Move caret To line head
+ctrl+;     |  Move caret To line end
+ctrl+l     |  expand line selection
+
+ctrl+点击/d  |  Go To Declaration Or Usage
 ctrl+e     |  Next highlighted Error
 ctrl+p     |  Search EveryWhere
-shift+shift/f1 | find file
+shift+shift/shift+/ | find file
 alt+h      |  type hierarchy
-alt+←/→    |  Back/Forward
 alt+enter   | show quick fix
+f6      | refactor
 ctrl + enter  | accept ai tool advice
-alt+r      | refactor this
-
 
 (shift) +f5 | run(debug)
-ctrl + t | terminal
+ctrl + t | toggle terminal
+ctrl + b | recent file
