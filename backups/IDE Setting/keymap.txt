@@ -28,7 +28,7 @@ ctrl+g     |  go to line
 ctrl+点击/d  |  Go To Declaration Or Usage
 ctrl+e     |  Next highlighted Error
 ctrl+p     |  Search EveryWhere
-shift+shift/shift+/ | find file
+shift+shift | find file(jetbrains only)
 alt+h      |  type hierarchy
 alt+enter   | show quick fix
 f6      | refactor
@@ -36,4 +36,4 @@ ctrl + enter  | accept ai tool advice
 (shift) +f5 | run(debug)
 ctrl + t | toggle terminal
 ctrl + n | recent file
-f4       | select in(only jetbrains)
+f4       | select in(jetbrains only)
