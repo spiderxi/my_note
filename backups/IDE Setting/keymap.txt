@@ -12,7 +12,7 @@ alt+shift+⬇️|  duplicate line
 alt+s      |  reformat file
 ctrl + /   |  Comment With Line Comment
 alt+←/→    |  Back/Forward
-ctrl+b     |  toggle primary side bar visiability
+ctrl+b     |  toggle primary side bar visiability(vscode only)
 
 ctrl+j     |  Left
 ctrl+u | move caret to previous word with selection
