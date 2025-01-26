@@ -23,6 +23,7 @@ ctrl+m     |  Down
 ctrl+h     |  Move caret To line head
 ctrl+;     |  Move caret To line end
 ctrl+l     |  expand line selection
+ctrl+g     |  go to line
 
 ctrl+点击/d  |  Go To Declaration Or Usage
 ctrl+e     |  Next highlighted Error
