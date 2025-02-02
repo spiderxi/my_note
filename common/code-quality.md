@@ -35,12 +35,12 @@ BUG发现得越晚, 修复BUG的代价就越高
 
 _**不同语言常用的单元测试框架?**_
 
-| 语言/运行时 | 框架           |
-| ----------- | -------------- |
-| Java        | Junit, Meckito |
-| Cpp         | GoogleTest     |
-| Python      | pytest         |
-| Node.js     | Jest, Vitest   |
+| 语言/运行时  | 框架             |
+| ------- | -------------- |
+| Java    | Junit, Meckito |
+| Cpp     | GoogleTest     |
+| Python  | pytest         |
+| Node.js | Jest, Vitest   |
 
 _**在 Junit 的单元测试类中, 为什么没有 main 方法依然可以执行测试代码?**_
 
@@ -110,7 +110,7 @@ _**Meckito 框架的最大优点?**_
 **_javadoc 注释中常用的标签有哪些?_**
 
 ```
-@param	参数描述
+@param    参数描述
 @return 返回值描述
 @deprecated
 @see 参考
@@ -124,16 +124,16 @@ _**Meckito 框架的最大优点?**_
 
 **_lombok 中常用的注解有哪些?_**
 
-| 注解                          | 说明               |
-| ----------------------------- | ------------------ |
-| **@Getter**             |                    |
-| **@Setter**             |                    |
-| @ToString                     |                    |
-| @EqualsAndHashCode            |                    |
-| **@XxxArgsConstructor** |                    |
-| **@Data**               |                    |
+| 注解                      | 说明        |
+| ----------------------- | --------- |
+| **@Getter**             |           |
+| **@Setter**             |           |
+| @ToString               |           |
+| @EqualsAndHashCode      |           |
+| **@XxxArgsConstructor** |           |
+| **@Data**               |           |
 | **@Builder**            | 支持链式调用初始化 |
-| **@Slf4j**              | 支持 log           |
+| **@Slf4j**              | 支持 log    |
 
 **_lombok 注解如何生效?_**
 
@@ -202,6 +202,14 @@ git config --global user.name "用户名"
 git config --global user.email "none@email.com"
 git config --global http.proxy "http://localhost:7890"
 ```
+
+ **_暂存区和工作目录的区别?_**
+
+```
+
+```
+
+
 
 **_常用的开发分支?_**
 

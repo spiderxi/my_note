@@ -31,10 +31,10 @@ SelectionKey是对Channel和Selector之间注册关系的封装, 包含了:
 
 ***`ServerSocketChannel`和 `SocketChannel`的可选择事件的差异?***
 
-|                       | accept | read | write | connection |
-| --------------------- | ------ | ---- | ----- | ---------- |
-| ServerSocketChannel   | √     |      |       |            |
-| SocketChannel(客户端) |        | √   | √    | √         |
+|                     | accept | read | write | connection |
+| ------------------- | ------ | ---- | ----- | ---------- |
+| ServerSocketChannel | √      |      |       |            |
+| SocketChannel(客户端)  |        | √    | √     | √          |
 
 ## 2. 零拷贝
 
