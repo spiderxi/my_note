@@ -64,6 +64,8 @@ tip3: maven插件本质也是一个jar包, 因为maven运行在jvm中
 _讲一下 Maven 中 Build Lifecycle 中主要的 phase?_
 
 ```
+* clean
+
 * compile
 
 * test
@@ -83,7 +85,7 @@ profile标签中的配置只有在满足profile的条件时才会生效
 
 ## 3. 依赖管理
 
-_maven 中依赖项的 `<scope>` 有哪些?_
+_maven 中依赖项的_ _`<scope>`_ _<scope>_ _有哪些?_
 
 ```
 * complie(默认): 会打包到jar包中
@@ -99,10 +101,10 @@ _maven 中依赖项的 `<scope>` 有哪些?_
 * optional: 该依赖无传递性
 ```
 
-_版本号 `1.0-SNAPSHOT` 中的 SNAPSHOT 有什么含义?_
+_版本号_ _`1.0-SNAPSHOT`_ _1.0-SNAPSHOT_ _中的 SNAPSHOT 有什么含义?_
 
 ```
-maven在每次编译时会尝试获取并使用最新子版本
+maven在每次编译时会尝试从仓库中获取并使用最新子版本
 ```
 
 _什么是依赖冲突, 如何解决?_
@@ -111,6 +113,12 @@ _什么是依赖冲突, 如何解决?_
 两个版本的依赖都存在时, maven可能会选择低版本的依赖, 导致不能使用高版本特性
 
 tip: 解决方法为使用<dependancyManagement>锁定高版本或使用optional scope
+```
+
+_如何配置仓库地址&插件地址和代理策略?_
+
+```
+在Maven安装目录/conf/settings.xml中配置
 ```
 
 # 2. Gradle
@@ -124,6 +132,7 @@ _Gradle Wrapper 是什么?_
 
 tip1: 使用gradlew指令替代gradle
 tip2: 使用gradle wrapper指令可以生成wrapper相关文件
+tip3: gradle各版本之间差异较大, 所以尽可能使用wrapper
 ```
 
 _如何新建一个 gradle 结构的项目?_
