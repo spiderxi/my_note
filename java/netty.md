@@ -2,80 +2,56 @@
 
 ## 1. NIO
 
-***讲一下Java NIO?***
+***讲一下Java NIO中的抽象类?***
 
 ```
 Java NIO 主要包含三个抽象:
-* Channel
-* ByteBuffer
-* Selector
-
-Channel读写数据到ByteBuffer中
-Channel可以注册到Selector中(返回SelectionKey)
-Selector调用select方法进行nio, 获取IO就绪的SelectionKey集合
+🌟 Channel: IO对象, 可以注册到Selector中(注册时需要指明可选择的IO事件)
+🌟 ByteBuffer: 缓冲区, 可以作为Channel读写的对象
+🌟 Selector: 调用select方法获取所有SelectionKey(注册的Channel+就绪IO事件)
 ```
 
-![1697725256818](image/netty/1697725256818.png)
-
-***讲一下SelectionKey?***
-
-```
-SelectionKey是对Channel和Selector之间注册关系的封装, 包含了:
-
-* interest set: 注册的需要关注的IO事件
-
-* ready set: 被选择时已就绪的IO事件
-
-* attachment: 与注册相关联的ByteBuffer/Object
-```
-
-***`ServerSocketChannel`和 `SocketChannel`的可选择事件的差异?***
-
-|                     | accept | read | write | connection |
-| ------------------- | ------ | ---- | ----- | ---------- |
-| ServerSocketChannel | √      |      |       |            |
-| SocketChannel(客户端)  |        | √    | √     | √          |
-
-## 2. 零拷贝
+## 2. Zero Copy
 
 ***什么是零拷贝?***
 
 ```
-零拷贝指操作系统提供的系统调用mmap()和sendFile, 避免数据在内核缓冲区和应用程序缓冲区之间不必要的拷贝
+零拷贝指操作系统提供的mmap()和sendFile()等系统调用, 避免数据在内核缓冲区和应用程序缓冲区之间不必要的拷贝
 ```
-
-![1697726158014](image/netty/1697726158014.png)
 
 ***mmap和sendFile的区别?***
 
 ```
-mmap(): 将应用程序的虚拟地址映射到内核空间上, 读写都是内核空间和外设之间读写
+mmap: 将应用程序的虚拟地址直接映射到内核空间缓冲区的物理地址上(通过MMU实现)
 
-sendFile(): 直接在内核空间的两个缓冲区间进行数据拷贝
+sendFile: 直接在操作系统内核空间的两个缓冲区(也称文件描述符)间进行数据复制
+
+🌙注意mmap性能低于sendFile
+🌙mmap也可以作为进程间通信方式之一(共享内存)
 ```
+mmap
+![alt text](image/netty/image.png)
+sendFile
+![alt text](image/netty/image-1.png)
 
-***说一下HeapByteBuffer和MappedByteBuffer的区别?***
-
-```
-* HeapByteBuffer: 底层使用JVM堆区的byte[]
-
-* MappedByteBuffer底层使用mmap(), 使用内核区byte[]
-```
-
-## 3. 线程模型
-
-***什么是Reactor模型(单Reactor多线程/主从Reactor模型)?***
+***Java NIO中HeapByteBuffer和MappedByteBuffer的区别?***
 
 ```
-Reactor线程在循环中使用NIO的方式监听就绪IO的事件, 将IO事件分发给Worker线程处理
+🌟 HeapByteBuffer: 底层使用JVM堆区的byte[]
+🌟 MappedByteBuffer底层使用mmap(), 使用内核区byte[]
+```
 
-根据Reactor线程和处理线程的数量又详细分为:
+## 3. IO线程模型
 
-* 单Reactor单线程(如redis)
+***什么是Reactor模型?***
 
-* 单Reactor多线程
+```
+Reactor线程在循环中使用NIO的方式监听就绪IO的事件, 并将IO事件分发给Worker线程处理
 
-* 主从Reactor(如netty服务端)
+根据Reactor线程和Worker线程的数量又详细分为:
+🌟单Reactor单线程(如Redis, 一个线程同时负责select和处理)
+🌟单Reactor多线程
+🌟主从Reactor(如netty服务端)
 ```
 
 ***什么是Proactor模型?***
@@ -86,62 +62,93 @@ Reactor线程在循环中使用NIO的方式监听就绪IO的事件, 将IO事件�
 
 # 2. Netty
 
-## 1. Netty架构
+## 1. Netty简介
 
-***讲一下Netty的抽象层相关概念和各个抽象之间的关系?***
-
-架构中主要包含的抽象概念有:
-
+***讲一下Netty的设计思想?***
 ```
----架构
-* Channel
-* Pipeline
-* ChannelHandler, ChannelHandlerContext
+Netty核心思想为责任链模式, Netty实现了一套并发编程模型
 
----并发和异步
-* EventLoop(Group)
-* Future, Promise
+🌟责任链模式
+ChannelPipeline中包含多个ChannelHandler可以依次处理IO事件, 处理的中间结果可以保存在ChannelHandlerContext中
+🌟并发编程模型
+EventLoop(Group)为线程/线程池的实现, 并实现了ChannelFutrue和ChannelFutureListener用于异步编程
 
----缓存
-* ByteBuf
+
+🌙Netty重新实现了Java NIO中的ByteBuffer和Channel为ByteBuf和Netty.Channel
 ```
 
-抽象概念之间的关系:
 
-![1697696497979](image/netty/1697696497979.png)
 
 ## 2. ChannelHandler
 
-***讲一下ChannelHandler的生命周期?***
-
-在 `Netty.Channel`被注册到 `EventLoop` 后依次执行:
-
-![1698141155981](image/netty/1698141155981.png)
-
-***使用 `Channel#fireXxx()`和 `ChannelHandlerContext.Xxx()`发布事件的区别?***
-
+***Channel和/ChannelPipeline/ChannelHander的关系?***
 ```
-事件在pipeline中传播的起点不同, 通过Channel发布事件是在head/tail节点开始, context发布时间是在当前节点的下一个节点开始
+🌟 Channel和ChannelPipeline一对一绑死
+🌟 一个ChannelPipeline可以添加/移除多个ChannelHandler
+🌟 一个ChannelHandlere可以被添加到多个ChannelPipeline中, 但必须添加@Shared注解
 ```
 
-## 3. Netty线程模型
+***Channel的生命周期有哪些?***
+```
+1️⃣ channelRegistered: Channel被注册到EventLoop
+
+2️⃣ channelActive: 网络连接建立
+
+3️⃣ channelRead: 从Channel中读取到ByteBuf
+3️⃣ channelReadComplete: 从Channel中读取到的数据小于BuyteBuf容量
+3️⃣ channelWritabilityChanged: Channel可写状态发生变化(网络拥塞导致channel从可写变为不可写)
+
+4️⃣ channelInactive: 网络连接断开
+
+5️⃣ channelUnregistered: Channel被EventLoop注销
+```
+
+***ChannelHandler的生命周期有哪些?***
+```
+1️⃣ handlerAdded: ChannelHandler被添加到ChannelPipeline时
+
+2️⃣ exceptionCaught: 之前的Handler中发生异常
+
+3️⃣ handlerRemoved: ChannelHandler被移除出ChannelPipeline时
+```
+
+***什么情况下会在ChannelPipeline中触发事件?***
+```
+🌟 Channel/ChannelHandler的生命周期发生变化时(被动事件)
+🌟 显式调用ChannelHandlerContext的方法发布主动事件时
+🌟 显式调用ChannelPipeline/Channel的发布主动事件时
+
+🌙 ChannelHandlerContext发布的事件起点为后续第一个Handler
+🌙 调ChannelPipeline/Channel发布的事件传播起点为/尾部第一个Handler
+🌙 ChannelHandler默认不传递事件, 可以继承ChannelHandlerAdapter(默认传递)
+```
+
+***常见的主动发布事件有哪些?***
+```
+🌟 write
+🌟 read
+🌟 flush(将缓冲区的数据刷到网卡中)
+🌟 close
+🌟 userEventTriggered
+```
+
+## 3. ByteBuf
+***ByteBuf的优点?***
+```
+内存池化(Pooled Buffer)
+```
+
+## 4. Netty线程模型
 
 ***Netty的线程模型是怎样的?***
 
 ```
-Netty中线程模型主要是有两个抽象:
+🌟EventLoop: 每个EventLoop为单Reactor单线程模型, 内部周期性进行NIO的select()和Selectionkey的处理, 并执行任务队列中的任务
 
-* EventLoop: 单Reactor单线程模型, 内部周期性进行NIO的select()和Selectionkey的处理, 并执行任务队列中的任务
-
-* EventLoopGroup: 线程池模型, 通过next()方法将注册Channel的任务委托给内部的EventLoop
+🌟EventLoopGroup: 线程池模型, 通过next()方法获取下一个EventLoop将注册Channel的任务委托给内部的EventLoop
 ```
 
-***服务端两个EventLoopGroup分别负责什么?***
-
+***如何使用EventLoop执行定时任务?***
 ```
-两个Group分别负责ServerSocketChannel和SocketChannel的NIO操作
-
-* Boss Group中的线程负责选择ServerSocketChannel的ACCEPT事件并将连接后的SocketChannel注册到Child Group
-
-* Child Group负责选择SocketChannel的Read Write事件
+eventLoop.scheduleAtFixedRate()或eventLoop.scheduleWithFixedDelay()
 ```

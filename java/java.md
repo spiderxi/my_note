@@ -321,8 +321,8 @@ IO流分四种:
 
 ```
 由于:
-* ArrayList内部是一个Object[]
-* LinkedList是一个Object双向链表
+🌟 ArrayList内部是一个Object[]
+🌟 LinkedList是一个Object双向链表
 
 所以两者的随机读写和插入数据的时间复杂度会有区别
 ```
@@ -552,4 +552,15 @@ ZoneDateTime额外保存时区ZoneId, 同一个时间戳时, 时间字符串会�
 ***System.currentmillis()和System.nanoTime()的区别?***
 ```
 System.currentmillis()返回值为1970开始的毫秒数, System.nanoTime()返回的为从JVM启动开始计算的纳秒数
+```
+
+## 6. Unsafe
+
+**_Unsafe类提供了哪些操作?_**
+```
+🌟 直接根据地址读写内存: #putLong() #getLong() #staticFieldBase()
+🌟 内存管理操作: #allocateMemory() #freeMemory()
+🌟 原子操作: #compareAndSwapLong() #getAndAddLong()
+🌟 读写屏障操作: #storeFence() #loadFence()
+🌟 线程操作: #park() #unPark()
 ```

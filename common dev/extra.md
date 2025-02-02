@@ -185,7 +185,7 @@ _存储单位从小到大有哪些?_
 = 2^-40 Tebibyte (TiB)
 = 2^-50 Pebibyte (PiB)
 
-🌙ISP经常十进制单位和二进制单位混淆, 十进制的单位有:
+🌙ISP经常将十进制单位和二进制单位混淆用来营销, 十进制的单位有:
 Kilobyte (KB)
 Megabyte (MB)
 Gigabyte (GB)
