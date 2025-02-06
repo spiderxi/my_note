@@ -27,7 +27,8 @@ ctrl+g     |  go to line
 
 ctrl+点击/d  |  Go To Declaration Or Usage
 ctrl+e     |  Next highlighted Error
-ctrl+p/shift+shift     |  Search EveryWhere
+ctrl+p/    | find in files
+shift+shift     |  Search EveryWhere(jetbrains only)
 alt+h      |  type hierarchy
 alt+enter   | show quick fix
 f6      | refactor
