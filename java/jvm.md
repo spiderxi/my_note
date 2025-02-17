@@ -21,9 +21,11 @@ Heap区线程私有的空间, 避免多线程下分配空间要使用CAS降低�
 
 ***什么是Direct Memory?***
 ```
-由操作系统管理的内存
+JVM进程向操作系统申请的内存, 相较于JVM的Heap区而言Direct Memory不会被GC(JDK4前Direct Memory又称为Native Memory)
 
-🌙 通过Unsafe.allocateMemory可以申请Direct Memory(底层通过mmap等系统调用实现)
+🌙 通过Unsafe.allocateMemory或ByteBuffer.allocateDirect可以申请Direct Memory
+🌙 当DirectByteBuffer对象被GC时, 对应的Direct Memory也会被归还给操作系统
+🌙 可以通过JVM参数设置Direct Memory最大大小
 ```
 
 
@@ -88,13 +90,18 @@ Heap区线程私有的空间, 避免多线程下分配空间要使用CAS降低�
 
 **_class 文件的结构?_**
 ```
-OXCAFEBABE + Java版本号 + 静态常量池 + 类的字段 + 方法列表
+OXCAFEBABE + Java版本号 + 静态常量池 + 类的字段定义 + 方法列表
 ```
 
 **_什么情况会触发一个类的加载?_**
 ```
 🌟主动引用类时(访问构造函数/static方法/static变量)
 🌟加载子类时
+```
+
+***_类加载的过程?_**
+```
+
 ```
 
 ## 2. 类加载器
@@ -242,7 +249,7 @@ Eden区GC算法为标记复制
 ```
 🌟 STW的时间和堆大小无关, O(1)时间复杂度, STW时间小于10ms
 🌟 空间换时间策略
-🌟 实现原理: 指针染色/读屏障
+🌟 实现原理: 指针染色+读屏障
 ```
 
 ## 4. GC API
