@@ -139,7 +139,7 @@ EnumClass.values()
 
 ## 2. 注解与反射
 
-**_Java 中的元注解有哪些, RetentionPolicy策略有哪些?_**
+**_Java 中的基础元注解有哪些, RetentionPolicy策略有哪些?_**
 
 | 注解名               | 详情                                                                                                                           |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -154,6 +154,13 @@ EnumClass.values()
 ```
 🌟 编译期注解通过AbstractProcessor生效(如Lombok)
 🌟 运行期注解通过反射Class#getAnnotations()生效
+```
+
+***如果在定义注解A时使用另一个注解B标注A会怎样?***
+```
+A会被当做B的元注解
+
+🌙 getDeclaredAnnotations方法没有递归寻找元注解, 只能返回第一层注解
 ```
 
 **_Java 中反射是什么, 反射为什么慢?_**
@@ -487,6 +494,14 @@ String类会在Heap区维护一个stringtable用于保存字符串常量, string
 
 tip1: stringtable不会自动扩容, 但可以通过JVM参数指定长度
 tip2: 使用String#intern()方法本质上是在用时间换空间
+```
+
+***为什么String是Immutable的?***
+```
+从结果上分析, 因为String为final类并且char[]为private final
+从设计上分析, 是为了保证String常量池的有效性
+
+🌙 String不可变的好处: 线程安全
 ```
 
 ## 3. Wrapper 类

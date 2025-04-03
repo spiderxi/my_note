@@ -276,7 +276,7 @@ singletonFactories: 缓存bean的ObjectFactory对象
 
 # 3. 事务管理
 
-## 1. Spring 事务基本盖帘
+## 1. Spring 事务基本概念
 
 **_事务的 ACID 特性指什么?_**
 
