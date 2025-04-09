@@ -34,12 +34,44 @@ _**什么是 Inverted Index?**_
 | 结构型数据库 | table          | row      | schema         | SQL(Structure Query Language)  |
 | 文档型数据库 | index          | document | mapping        | DSL(Domain Specified Language) |
 
-**_如何让一个字段可以使用多种类型的索引?_**
+**_如何让一个字段可以使用多种类型的索引方式?_**
 
 ```
 使用multi-fields功能, 在mapping中定义字段的子字段
 
-tip: 对于name字段, 一般类型为keyword, 想要支持分词匹配还需要添加类型为text的子字段
+tip: 对于name字段, 一般类型为keyword, 想要支持分词匹配还需要添加类型为text的子字段, 查询时使用match("name.子字段名称")的方式
+```
+
+***什么是Nested 字段?***
+```
+Nested字段是一种特殊的嵌套类型, 相当于List<Document>
+```
+
+***ES查询结果中有哪些重要字段?***
+```
+{
+    // 每个分片查询情况
+    "_shards": {
+        "total": 5,
+        "successful": 5,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": 总数,
+        "max_score": 文档最大相关性得分,
+        "hits": [
+            {
+                "_index": 索引名称,
+                //  每个文档的分类, 高版本7.0后被废弃
+                "_type": document类型,
+                "_id": 主键id,
+                "_score": 相关性得分,
+                "_source": 文档内容
+            }
+        ]
+    }
+}
 ```
 
 # 2. ES 查询
@@ -78,9 +110,10 @@ tip: 对于name字段, 一般类型为keyword, 想要支持分词匹配还需要
 🌙 ES在系统级别限制了深分页最大offset+limit <= 10000
 ```
 
-***ES 使用Search After查询时需要注意什么?***
+***ES 使用Search After查询时需要注意什么?和scroll查询的区别?***
 ```
-search_after查询本身无状态, 不维护查询上下文, 所以sort字段应当具有唯一性
+🌟search_after查询本身无状态, 不维护查询上下文, 所以sort字段应当具有唯一性
+🌟scroll查询有状态, 维护查询上下文
 ```
 
 **_如何高亮搜索关键字?_**
