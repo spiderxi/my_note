@@ -39,10 +39,18 @@ _**什么是 Inverted Index?**_
 ```
 使用multi-fields功能, 在mapping中定义字段的子字段
 
-tip: 对于name字段, 一般类型为keyword, 想要支持分词匹配还需要添加类型为text的子字段, 查询时使用match("name.子字段名称")的方式
+🌙 对于name字段, 一般类型为keyword, 想要支持分词匹配还需要添加类型为text的子字段, 查询时使用match("name.子字段名称")的方式
 ```
 
-***什么是Nested 字段?***
+***常用的字段类型有哪些?***
+```
+text, keyword, long, integer, double, float, date, boolean
+
+🌙 匹配查询时使用倒排索引
+🌙 范围查询时使用BKD树索引
+```
+
+***什么是Nested字段?***
 ```
 Nested字段是一种特殊的嵌套类型, 相当于List<Document>
 ```
@@ -50,6 +58,8 @@ Nested字段是一种特殊的嵌套类型, 相当于List<Document>
 ***ES查询结果中有哪些重要字段?***
 ```
 {
+    // 耗时
+    "took": 1,
     // 每个分片查询情况
     "_shards": {
         "total": 5,
@@ -102,7 +112,19 @@ Nested字段是一种特殊的嵌套类型, 相当于List<Document>
 可以定义相关性得分的再计算函数func: 最终相关性得分 = func(相关性得分)
 
 🌙function_score_query如果使用随机权重可以实现每次分页查询结果都不同的效果
+🌙如果不指定任何排序规则, 默认按相关性得分排序
 ```
+
+***介绍一下Query Phase和Fetch Phase?***
+```
+ES的查询分为Query Phase和Fetch Phase
+🌟 Query Phase: 协调节点将查询路由到多个数据节点数, 据节点根据倒排索引(分词查询和匹配查询)/BKD树索引(范围查询)过滤出"_id", 并根据bool逻辑取并集或交集, 将过滤后的文档部分字段("_id"和"_score")返回协调节点
+🌟 Fetch Phase: 协调节点进行归并排序, 确定结果页后根据"_id"从数据节点获取完整数据
+
+🌙 Query Phase时数据节点会进行TopK排序, Fetch Phase时协调节点仅进行K路归并排序
+🌙 如果为聚合查询聚合方式和排序类似, 数据节点进行初步聚合, 协调节点最终聚合
+```
+
 
 **_ES 会有深分页问题吗?如何解决?_**
 
@@ -144,7 +166,7 @@ DSL中使用"highlignt"
 **_text 和 keyword 的区别?_**
 
 ```
-🌟 text可以使用分词器进行match查询
+🌟 text在可以使用分词器进行match查询
 🌟 keyword是一个完整的文本不会被分词, 仅用于terms匹配
 ```
 
