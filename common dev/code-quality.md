@@ -92,12 +92,12 @@ _**为什么不建议在单元测试中调用其他服务或访问数据库?**_
 **_javadoc 注释中常用的标签有哪些?_**
 
 ```
-@param    参数描述
-@return 返回值描述
-@deprecated
-@see 参考
-{@link 包.类#成员} --文档内跳转
-<p></p>
+@param 参数说明
+@return 返回值说明
+@deprecated 弃用原因
+@see 参考类/字段跳转
+{@link 包.类#成员} 文档内跳转
+<p></p> 支持html标签
 <a href="url">链接说明</a>
 
 🌙使用javadoc可以生成代码文档
@@ -116,9 +116,9 @@ _**为什么不建议在单元测试中调用其他服务或访问数据库?**_
 | **@XxxArgsConstructor** |           |
 | **@Data**               |           |
 | **@Builder**            | 支持链式调用初始化(注意会将构造函数私有化) |
-| **@Slf4j**              | 支持 log    |
+| **@Slf4j**              | 支持 Simple Logging Facade    |
 
-**_Lombok 注解如何生效?_**
+**_Lombok 注解生效的原理?_**
 
 ```
 🌙Java提供了SPI: AnnotationProcessor, 在编译阶段Java会调用该接口的实现类中的方法处理注解
@@ -130,7 +130,14 @@ _**为什么不建议在单元测试中调用其他服务或访问数据库?**_
 
 ```
 日志框架: Slf4j
-日志实现: log4j/logback
+日志实现: log4j2/logback2/JUL(基本没人用)
+
+🌙 多一层抽象层可以方便替换
+```
+
+***slf4j-api.jar是如何绑定到具体实现的?***
+```
+应用调用LoggerFactory#getLogger获取Logger时, 底层调用ClassLoader#getResource按path加载StaticLoggerBinder (StaticLoggerBinder由log4j2-slf4j.jar等绑定包提供)
 ```
 
 **_常用日志的级别?_**
@@ -140,6 +147,10 @@ debug
 info
 warning
 error
+
+🌙 高频接口尽量不打印日志, 否则会导致频繁Young GC
+🌙 生产环境日志级别不能为debug
+🌙 大对象不要频繁打印日志, 会导致频繁Full GC
 ```
 
 **_打印异常日志时需要记录哪些内容?_**
@@ -148,18 +159,38 @@ error
 🌟 Exception对象(如有)
 🌟 造成异常的业务对象
 🌟 异常提示文本
+
+🌙 如果日志输出时涉及字符串拼接或方法调用, 如logger.warn("warn:" + errorCode + e.getMessage()), 如要前置if判断logger.isWarnEnabled
+🌙 尽量使用参数化日志, 即logger.debug("param:{}", param)
 ```
 
-***日志打印大对象or频繁打印日志会造成什么问题?***
+***为什么要使用分布式日志架构?***
 ```
-打印大对象(>1M, 字符超过30万)会导致频繁Full GC
-频繁打印日志会导致Young GC频次增加, 单次GC时间增加
+单机日志查询需要登录机器使用grep/awk检索日志文件, 效率低, 并且多节点时几乎无法实现日志查询
+
+🌙 分布式日志架构: 每个节点一个log-agent负责日志收集, log-agent ==> kafka ==> ElasticSearch 
 ```
+
+***Log4j2的抽象层架构?***
+```
+🌟 Logger: 检查日志级别, 封装日志事件委托给Appender
+🌟 Filter: 在日志事件到达 Appender 或 Logger 时进行过滤
+🌟 Appender: 指定输出目标和方式
+🌟 Layout: 定义日志事件的输出格式
+
+🌙 如果需要扩展log4j2, 可以将上述抽象层接口实现类放到类路径下, 添加@Plugin注解, 并修改配置文件
+🌙 配置文件中可以配置多个logger/appender, 每个logger可以单独配置日志级别level和关联的appender
+🌙 使用slf4j获取Logger时如未指定名称兜底返回root logger
+🌙 一个logger可以关联多个appender, 不考虑filter的话所有appender都会输出日志
+🌙 内置的AsyncAppender可以实现异步输出日志大幅提高性能, AsyncAppender采用了生产者-消费者模型, append()时将日志事件放到阻塞队列中, 创建一个消费者线程批处理日志事件
+```
+
+******
 
 ## 4. 金额处理
 ***代码中金额用什么类型存储和计算?***
 ```
-存储和加减乘计算使用Long, 除法计算使用BigDecimal.valueOf转换后进行计算(注意使用四舍五入/截断策略)
+存储和加减乘计算使用Long, 除法计算使用BigDecimal.valueOf转换后进行计算(注意使用Rounding策略)
 ```
 
 ***为什么尽量使用BigDecimal.valueOf()方法而不是constructor方法来构造对象?***

@@ -152,7 +152,7 @@ EnumClass.values()
 
 **_编译期注解和运行期注解分别是如何生效的?_**
 ```
-🌟 编译期注解通过AbstractProcessor生效(如Lombok)
+🌟 编译期注解通过AbstractProcessor生效(如Lombok/log4j), 在编译时javac通过SPI机制找到所有AbstractProcessor的实现类
 🌟 运行期注解通过反射Class#getAnnotations()生效
 ```
 
@@ -265,6 +265,8 @@ Java7引入的语法糖, 在try代码块执行后可自动关闭Closeable
 **_什么是 SPI?_**
 ```
 SPI(Service Provider Interface)是Java提供的扩展机制, 可以在运行时加载 `实现了特定接口的第三方服务实现类`
+
+🌙 SPI还可以在编译时加载注解处理器实现类, 用于扩展编译过程(如lombok生成getter/setter方法, log4j扫描插件生成索引文件), 所以javac执行时需要指定类路径
 ```
 > SPI 典型应用: JDBC(Java 连接关系型数据库的标准接口库)
 
