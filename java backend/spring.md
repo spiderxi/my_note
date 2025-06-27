@@ -1,19 +1,11 @@
 # 1. IOC
 
-## 1. IOC
+## 1. IOC简介
 
 _使用 IOC 的好处?_
 
 ```
 使用IOC容器管理对象之间的依赖关系, 解耦业务对象
-```
-
-_IOC 容器注入依赖对象的方式有哪些?_
-
-```
-* 构造器注入
-* setter方法注入
-* 反射注入
 ```
 
 _BeanFactory 和 FactoryBean 的关系?_
@@ -24,483 +16,277 @@ _BeanFactory 和 FactoryBean 的关系?_
 
 ## 2. Bean
 
-_Spring 有哪些方式可以获取 Bean 的注册信息?_
+_讲一下bean的生命周期?_
 
 ```
-1. 读取配置文件
+1️⃣实例化: 通过反射调用无参构造方法new对象
+2️⃣依赖注入: 从容器中获取依赖对象并注入字段值, 如果依赖对象未就绪则进行依赖对象的注册
+3️⃣Aware接口回调: 如果bean实现了Aware接口, 则回调
+4️⃣BeanPostProcessor前置回调执行
+5️⃣init方法
+6️⃣BeanPostProcessor后置回调执行
+7️⃣destroy方法
 
-2. 扫描特定包下的所有类, 通过反射读取注册信息
-
-tip: 使用@ComponentScan注解或在配置文件中添加<<context:component-scan>开启包扫描
+🌙 BeanPostProcessor可以对注入依赖后的bean进行处理, 甚至可以替换bean, 是AOP/动态配置的实现原理
+🌙 init方法中尝尝用于初始化资源(如网络连接), destroy方法中尝试释放资源 
+🌙 Aware接口的作用是注入一些特殊依赖, 如ApplicationContext
+🌙 依赖注入不是一个单独的阶段, 其依赖于InitDestroyAnnotationBeanPostProcessor(BeanPostProcessor子接口)实现, 实现该接口的Bean可扩展此生命周期
 ```
 
-_Bean 的 常用 Scope 有哪些?_
+_Spring容器注入依赖对象的方式有哪些?_
 
 ```
->> singleton(默认scope): 每次从容器中获取的bean是同一个对象
+🌟 构造器注入
+🌟 setter方法注入
+🌟 反射注入
 
->> prototype: 每次从容器中获取的bean是新的对象
+🌙 当使用构造器注入时, 如果发生循环依赖会报错
 ```
 
-_讲一下 bean 的生命周期?_
+_Bean常见的Scope有哪些?_
 
 ```
-1. 实例化(调用constructor方法)
-
-2. 依赖注入
-
-3. 初始化, 使用, 销毁
+🌟 singleton(默认scope): 每次从容器中获取的bean是同一个对象
+🌟 prototype: 每次从容器中获取的bean是新的对象
 ```
 
-_懒加载和预加载 Bean 的区别?_
-
+_懒加载和预加载Bean的区别?_
 ```
 Bean为懒加载时, 会在getBean()时才会开始生命周期, 预加载Bean则会在容器启动时就开始
-
-tip: 默认为预加载, 使用@Lazy注解指定Bean懒加载
 ```
 
-_如何标注 Bean 的 init/destory 钩子方法?_
+_BeanFactoryPostProcessor和BeanPostProcessor的区别?_
 
 ```
-使用@PostConstruct 和 @PreDestory标注
-```
+🌟 BeanPostProcessor: 可以在bean初始化前后进行拦截, 修改/替换bean实例, 
+🌟 BeanFactoryPostProcessor: 在容器加载完Bean定义组装成BeanDefinitionRegistry后进行拦截, 修改/新增/删除Bean定义
 
-_如何在容器启动后, 实例化阶段, 依赖注入阶段前后对 Bean 进行再加工?_
-
-```
-往容器中注册下面的Bean:
-* BeanFactoryPostProcessor
-* InstantionAwareBeanPostProcessor
-* BeanPostProcessor
-
-tip: @Value中的通配符实现原理为在BeanFactoryPostProcessor修改Bean注册信息
-```
-
-_如何将 IOC 容器对象注入为依赖?_
-
-```
-注入特殊的依赖可以让Bean实现XxxAware接口, 通过方法注入
-
-例如: BeanNameAware, ApplicationContextAware
+🌙 两个PostProcessor都是Bean, 可以通过定义Bean进行扩展
+🌙 bean的注册的时序为: Bean定义加载完成 => BeanFactoryPostProcessor注册就绪 => BeanPostProcessor注册就绪 =>  普通Bean注册就绪
+🌙 BeanFactoryPostProcessor不能注入依赖, 因为依赖注入使用了BeanPostProcessor, 此时还没有就绪
+🌙 先注册的BeanPostProcessor会对后续BeanPostProcessor的注册过程进行拦截, 所以进行依赖注入的BeanPostProcessor优先级很高
 ```
 
 ## 3. 基于注解的开发
 
-_如何开启 Spring 的注解开发?_
-
-```
-在 spring 配置文件中加入<context:component-scan>
-
-tip: springboot默认开启包扫描, 不用额外配置
-```
-
 _@Autowired 和 @Resource 的区别?_
 
 ```
-* @Autowired 优先使用ByType的方式注入
+🌟 @Autowired: 优先使用ByType的方式注入
+🌟 @Resource: 优先使用byID的方式注入, 默认字段名称为beanId
 
-* @Resource("beanID") 优先使用byID的方式注入
-
-tip1: 可以使用@Qualifier指明beanId
-tip2: 当需要注入的类型为 Collection 时, 会将容器内所有符合要求的类型都注入到容器中
+🌙 可以使用@Qualifier指定beanId
+🌙 当需要注入的类型为Collection时, 会将容器内所有符合要求的类型都注入到容器中
 ```
 
-_哪些 Spring 注解的作用是注册 Bean?_
+_常用注解及其作用?_
 
 ```
-* 类注解: @Component @Service @Controller @Mapper @Configuration
+🌟 @Component及其派生注解在包扫描时, 视作bean定义
+🌟 @PostConstruct @PreDestory可以标识init/destory方法
+🌟 @Bean可以将方法返回值注册为bean
+🌟 @Import及其派生注解可以额外加载bean定义
+🌟 @Value可以注入常量或使用占位符注入配置
+🌟 @Scope可以标识bean的scope
+🌟 @Lazy可以标识bean为懒加载
 
-* 方法注解: @Bean
+🌙 @Bean的实现原理为一个内置的BeanFactoryPostProcessor, 新增了bean定义并注册到BeanDefinitionRegistry中
+🌙 @Value的实现原理为一个内置的BeanFactoryPostProcessor, 作用为替换bean定义中的占位符
 ```
 
-_如何将配置文件中的配置注入为依赖?_
-
+*包扫描的实现原理?*
 ```
-* @Value + 通配符
-
-* 使用@ConfigurationProperties
-```
-
-_Spring 中@Import 注解的作用?_
-
-```
-Bean类如果被@Import标注, 会额外注册指定的类为Bean, 即使不在包扫描范围内
-
-tip: @Import常见的应用为@EnableXxx注解
+使用ASM(字节码解析)库, 扫描指定目录下的所有class文件, 分析类的元信息并封装成BeanDefinitionHolder
 ```
 
 # 2. AOP
 
-## 1. AOP 理论
+## 1. AOP简介
 
-**_AOP 中的各种概念的含义?_**
-
-```
-joinpoint: 可以切入的点
-pointcut: 对一类可以切入的点的描述
-advice: 需要切入的逻辑
-aspect: 对pointcut和advice的模块化封装
-wave: 切入的过程
-waver: 执行切入过程的角色
-target: 被切入的对象
-```
-
-![1689041613913](image/Spring&Mvc&Boot/1689041613913.png)
-
-**_Advice 有哪些类型?_**
+_AOP 中的各种术语的含义?_
 
 ```
-Before Advice: 方法执行前的通知
-After Returning Advice
-After Throwing Advice
-After Advice: 方法执行后的通知, 不论方法是否抛异常还是执行成功返回值
-Around Advice
+🌟 Joinpoint: 可以切入的点 (例如某个方法)
+🌟 Pointcut: 可以切入的点的集合 (例如一类方法)
+🌟 Advice: 需要切入的逻辑
+🌟 Aspect: Pointcut和Advice的组合
 ```
 
-**_Java 中实现 AOP 常见的方法?_**
+_Advice 有哪些类型?_
 
 ```
-使用JDK动态代理
-使用CGLIB等动态字节码增强库实现动态代理
+🌟 Before Advice: 方法执行前的逻辑
+🌟 After Returning Advice: 方法正常返回的后置逻辑
+🌟 After Throwing Advice: 方法抛出异常的后置逻辑
+🌟 After Advice: 方法执行后的逻辑
+🌟 Around Advice: 方法执行前后的逻辑
 ```
 
-**_Aop 具体应用场景有哪些?_**
+_Java 中实现 AOP 常见的方法?_
 
 ```
-* 日志/系统监控: 将方法的调用情况记录下来
-* 缓存
-* 事务管理
-* 访问控制: 如果没有权限则拒绝访问
-* 异常处理: 当发生uncheckedException时通知管理员
+🌟 编译时直接修改字节码
+🌟 运行时生成代理类(代理方式可以为JDK动态代理或CGLIB代理)
 ```
 
-## 2. SpringAop 原理
-
-SpringAop 采用动态代理的方式在代理对象中织入切面, 如果被代理对象实现类接口采用 JDK 动态代理, 否则采用 CGLIB 库实现动态代理
-
-具体代理代码如下
-
-![1689151389674](image/Spring&Mvc&Boot/1689151389674.png)
-
-**_JDK 动态代理如何实现?_**
+_Aop 具体应用场景有哪些?_
 
 ```
-关键方法Proxy.newProxyInstance(), 关键类InvocationHandler
-!!!JDK通过动态代理生成的代理对象和被代理对象必须实现同样的接口
+🌟 日志监控: 环绕通知, 上报方法入参和出参
+🌟 事务管理: 例如声明式事务
+🌟 权限控制: 前置通知, 如果没有权限则拒绝访问
+🌟 统一异常处理: 异常后置通知, 捕获异常上报监控平台
 ```
 
-```java
-public static void main(String[] args) {
-    Subject subject = new Subject();
-// JDK生成的代理对象会赋值给接口
-ISubject iSubject = (ISubject) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(),
-Subject.class.getInterfaces(), new MyInvocationHandler(subject));
-iSubject.hello();
-}
-static class MyInvocationHandler implements InvocationHandler {
-    private Object target;
-    public MyInvocationHandler(Object target) {
-        this.target = target;
-}
-    @Override
-public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println("前置通知");
-Object ret = method.invoke(target, args);
-System.out.println("后置通知");
-        return ret;
-}
-}
+## 2. SpringAOP 原理
+
+_JDK动态代理如何实现?_
+```
+通过反射在运行时动态生成一个目标接口的子类
+
+🌙 JDK动态代理有局限,直接代理特定接口的方法
+🌙 SpringAOP优先使用JDK动态代理, 其次才是CGLIB代理
 ```
 
-**_CGLIB 动态代理如何实现?_**
-
+_CGLIB 动态代理如何实现?_
 ```
-通过Enhancer生成一个类的子类对象(代理对象), 重写了非final方法用来织入切面
-```
-
-![1689045466856](image/Spring&Mvc&Boot/1689045466856.png)
-
-## 3. SpringAOP 使用
-
-1. 将一个 POJO 声明一个为一个 Aspect
-2. 开启 `@EnableAspectJAutoProxy`
-
-```java
-@Component
-@Aspect
-public class MyAspect {
-    @Pointcut("execution(void spider.myspr.aop.Test.hello())")
-    public void onMethodExecution() {}
-
-    @Before("onMethodExecution()")
-    public void beforeAdvice() {
-        System.out.println("i will say hello");
-    }
-
-    @After("onMethodExecution()")
-    public void afterAdvice() {
-        System.out.println("i have said hello");
-    }
-}
+运行时生成字节码文件并使用类加载器加载到JVM中, 代理类是目标类的子类
 ```
 
-**_@EnableAspectJAutoProxy 的作用?_**
-
+_Spring AOP的实现原理?_
 ```
-开启自动代理, 会往容器中注册一个AnnotationAwareAspectJAutoProxyCreator(是一个BeanPostProcessor)用于自动识别带@Aspect的bean并为Aspect类中描述的需要代理的对象生成代理对象, 也可以注册XxxAdvisor, 根据XxxAdvisor中描述的对象生成代理对象
-```
+Spring识别到@EnableAspectJAutoProxy注解后, 会往容器中注册一个BeanPostProcessor(SmartInstantiationAwareBeanPostProcessor)用于自动识别带@Aspect的Bean, 并为Aspect涉及的Bean生成代理Bean
 
-**_Aop 失效的场景?_**
-
-```
-* target对象中需要代理的方法是final方法, 会导致代理对象无法重写该方法, aop失效
-* target对象中需要代理的方法A的方法体中调用了target对象中另一个需要代理的方法B, 在代理对象中调用A()会使得B()的通知失效
+🌙 生成代理类的时机一般为BeanPostProcessor的后置回调, 但如果出现"循环依赖+AOP代理"的情况, 会在依赖注入期间就生成代理类
+🌙 Bean注册优先级: BeanPostProcessor > Aspect > 需要AOP代理的普通Bean
 ```
 
-## 4. 三级缓存机制
-
-**_什么是三级缓存?_**
+_常见的AOP 失效的场景?_
 
 ```
-singletonObjects: 缓存初始化完成后的bean对象
-earlySingletonObjects: 缓存提前进行AOP织入后的代理对象
-singletonFactories: 缓存bean的ObjectFactory对象
+🌟 AOP的目标方法为final方法时失效, 因为final方法无法代理
+🌟 目标方法的调用方式为直接调用(如this.targetMethod()), 而不是通过bean调用(bean.targetMethod())
 ```
 
-**_为什么是三级而不是二级缓存?_**
+## 3. 三级缓存机制
 
-如果只有循环依赖问题理论只需要二级缓存就可以解决, 引入 `earlySingtonObjects`的作用是缓存早期代理对象
-
-![1689586509862](image/spring/1689586509862.png)
-
-# 3. 事务管理
-
-## 1. Spring 事务基本概念
-
-**_事务的 ACID 特性指什么?_**
+_什么是三级缓存?_
 
 ```
-* 原子性: 如果事务执行失败则回滚
-* 一致性: 事务前后数据库的完整性没有被破坏
-* 隔离性: 事务并发执行时可以保证不同执行顺序不影响最终的数据(通过事务的隔离级别实现)
-* 持久性: 事务对数据库的修改是永久的
+🌟 一级缓存: 业务最终使用的Bean, 已完成AOP代理和依赖注入
+🌟 二级缓存: 提前暴露的Bean, 已完成AOP代理, 不一定完成依赖注入
+🌟 三级缓存: ObjectFactory, ObjectFactory内部包含实例化后的Bean对象, 但在getBean调用时会
+
+🌙 二级缓存可以解决循环依赖的问题(A -> B -> A), 引入三级缓存是为了解决"AOP代理+循环依赖"场景的问题
+🌙 依赖注入时, 先检索一级缓存, 没有时检索二级缓存, 还没有检索三级缓存获取ObjectFactory, ObjectFactory方法内部会进行AOP代理并返回代理对象
+🌙 解决AOP代理的核心思想为延迟调用ObjectFactory获取代理后的对象
+🌙 ObjectFactory检测是否需要AOP代理依赖于SmartInstantiationAwareBeanPostProcessor(BeanPostProcessor子接口), 可扩展
 ```
 
-**_事务的隔离级别有哪些?_**
-
+## 4. 声明式事务
+_编程式事务和声明式事务的区别?_
 ```
-Isolation.READ_UNCOMMITTED : 事务期间其他事务写入的未提交的数据也有效-脏读问题
-
-Isolation.READ_COMMITTED :  事务期间其他事务写入的提交后的数据有效-不可重复读问题
-
-Isolation.REPEATABLE_READ: 事务期间不允许其他事务对同一个数据进行修改提交(增删可以提交)-幻读问题
-
-Isolation.SERIALIZABLE : 事务期间不允许其他事务对同一个数据进行增删改提交-性能问题
+编程式事务: 手动调用事务管理API
+声明式事务: 通过AOP实现
 ```
 
-**_事务的传播行为指什么? 有哪些传播行为?_**
-
-在一个@Transactional 方法 A 内部调用了另一个@Transactional 方法 B 时, B 方法的行为为传播行为
-
+_Spring声明式事务实现原理?_
 ```
-Propagation.REQUIRED: 当前没有事务新建事务, 当前有事务则加入
-Propagation.SUPPORTS: 不新建事务, 当前有事务则加入
+基于AOP和JDBC原生事务管理API实现
 
-Propagation.REQUIRES_NEW: 新建一个事务, 如果之前有事务则挂起
-Propagation.NESTED: 新建一个嵌套事务(嵌套事务失败时, 外层事务也失败)
-Propagation.NOT_SUPPORTED: 不新建事务, 如果之前有事务则挂起
+1️⃣方法执行前: 使用JDBC DataSource获取Connection实例, 通过ThreadLocal绑定线程和Connection实例
+2️⃣方法执行中: 通过Spring 提供的DataSourceUtils工具类获取Connection实例
+3️⃣方法执行后: 通过ThreadLocal获取Connection实例, 提交事务或回滚, 然后释放Connection实例
 
-
-Propagation.MANDATORY: 方法执行前必须有一个事务, 否则抛异常
-Propagation.NEVER: 方法执行前必须没有一个事务, 否则抛异常
+🌙 @Transactional方法内部手动获取的Connection, Spring声明式事务无效
+🌙 @Transactional方法内如果开启子线程进行JDBC操作, Spring声明式事务无效
 ```
 
-## 2. Spring 事务管理架构
+# 3. SpringMVC
 
-**_spring 事务管理中重要的类以及类的作用?_**
+## 1. 原理
 
-```
-TransactionDefinition: 包含事务的隔离级别, 传播行为, 超时时间等事务定义信息
-TransactionStatus: 事务状态
-PlatformTransactionManager: 负责管理与线程绑定的连接上下文(jdbc中是Connection对象), 隔离了不同连接技术事务管理api的差异从而提供了统一的接口(不同的数据库连接技术对应不同的实现类, 如JDBC对应DataSourceTransactionManager)
-```
-
-![1689152886157](image/Spring&Mvc&Boot/1689152886157.png)
-
-## 3. 声明式事务
-
-**_声明式事务管理实现原理?_**
+_SpringMVC抽象层组件有哪些?_
 
 ```
-包含被@Transactional标注的方法的对象, 会通过aop在方法执行前使用PlatformTransactionManager获取与当前线程绑定的数据库连接上下文(在jdbc中是Connection)并开启事务, 在方法内部所有dao与数据库连接都使用同一个连接上下文, 当方法结束时, PlatformTransactionManager根据是否抛出特定异常决定是否回滚事务, 最后关闭连接上下文并与当前线程解绑
+🌟 DispatcherServlet: SpringMVC入口, 基于Tomcat
+🌟 HandlerMapping
+🌟 HandlerInterceptor: 在Hanlde处理前后拦截
+🌟 HandlerMethodArgumentResolver: Handler参数自动绑定
+🌟 Handler: 实际请求处理类, 返回ModelAndView
+🌟 HandlerMethodReturnValueHandler: Handler返回值处理
+🌟 ViewResolver: 从ModelAndView中解析出View
+
+🌙 SpringMVC基于tomcat
+🌙 核心架构思想为"责任链模式"
 ```
-
-**_声明式事务什么情况下会失效?_**
-
-```
-* 事务方法为final方法(aop失效)
-* 事务方法被同一个对象里的其他方法调用时(aop失效)
-* 事务方法为private方法时(spring规定的)
-```
-
-**_编程式事务如何使用?适用情况?_**
-
-编程式事务适合多线程情况下
-
-```java
-PlatformTransactionManager transactionManager = ...;  // 根据具体数据库技术获取相应的txmanager
-DefaultTransactionDefinition txDef = new DefaultTransactionDefinition();
-txDef.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-// 获取事务状态
-TransactionStatus txStatus = transactionManager.getTransaction(txDef);
-        try {
-            // 在此执行涉及数据库或其他资源的操作
-
-            // 操作成功完成后，提交事务
-            transactionManager.commit(txStatus);
-        } catch (Exception ex) {
-            // 发生异常时，回滚事务
-            transactionManager.rollback(txStatus);
-            throw ex;
-        }
-```
-
-# 4. SpringMVC
-
-## 1. 框架原理
-
-_Springmvc 中的组件有哪些?_
-
-![1673255572208](image/Spring/1673255572208.png)
-
-```
-tip: springmvc基于tomcat, 所以Dispatcherservlet需要映射所有请求路径
-```
-
-_SpringMvc 中拦截器(HandlerInterceptor)可以在哪些时机拦截请求?_
-
-```
-1.HandlerAdptor处理前
-2.HandlerAdptor处理后
-3.ViewResolver处理后
-```
-
-_SpringMvc 中如何统一处理 Controller 方法中抛出的异常?_
-
-```
-使用异常解析器(HandlerExceptionResolver)可以捕获异常并返回ModelAndView
-```
-
-![1689238009204](image/spring/1689238009204.png)
 
 ## 2. 注解开发
-
-### 4.2.1 Controller
-
-_Handler 方法的返回类型是什么?_
-
+_HandlerAdaptor类适配源类常用的注解?_
 ```
-ModelAndView
-```
+🌟 @RestController
+🌟 @ResponseBody
+🌟 @RequestMapping/@PostMapping/@GetMapping
 
-_怎样让 Handler 方法的返回对象直接序列化到 http 响应体中?_
-
-```
-1. 使用@RestController
-2. 添加@ResponseBody
+🌙 ResponseBody的原理是基于HandlerMethodReturnValueHandler
 ```
 
-_RestController 默认使用哪个库进行序列化?_
+_SpringMVC默认使用哪个库进行序列化?_
 
 ```
-默认使用JackSon进行序列化
+默认使用Jackson进行序列化
 
-tip1: Jackson序列化时需要getter方法
-tip2: 通过WebMvcConfigurer添加HttpMessageConverter可以扩展序列化器
+🌙 Jackson序列化时需要getter方法
+🌙 通过WebMvcConfigurer添加HttpMessageConverter可以扩展序列化器
 ```
 
-_如何将 Handler 方法和特定路径的请求绑定?_
+_Handler方法的哪些参数类型会被SpringMVC自动绑定?_
 
 ```
-使用@RequestMapping及子注解标记
+🌟 Servlet相关类: HttpServletRequest/HttpServletResponse/InputStream/OutputStream
+🌟 ModelAndView: 要返回的ModelView对象
+🌟 BindingResult: 参数验证的结果
+🌟 @RequestParam: query参数, form参数,  multipart参数
+🌟 @PathVariable: path参数
+🌟 @RequestBody: 请求体反序列化参数
+
+🌙 参数的自动绑定依赖参数解析器Bean(HandlerMethodArgumentResolver)实现, 可以通过注册自定义Bean扩展
 ```
-
-### 4.2.2 传递参数和依赖
-
-_Handler 方法的哪些参数类型会被自动注入?_
-
-```
-* HttpServletRequest/HttpServletResponse/InputStream/OutputStream: Servlet相关类
-
-* ModelAndView: 要返回的ModelView对象
-
-* BindingResult: 注入和验证参数的结果
-```
-
-_讲一下 Handler 方法的参数解析相关注解?_
-
-```
-* @RequestParam: query参数, form参数,  multipart参数
-
-* @PathVariable: path参数
-
-* RequestBody: 请求体反序列化参数
-```
-
-_如何自定义 Handler 方法的参数解析?_
-
-```
-通过通过WebMvcConfigurer配置HandlerMethodArgumentResolver
-```
-
 ## 3. MVC 配置
 
-_SpringMvc 的配置类需要实现什么接口?_
+_如何配置SpringMVC?_
 
 ```
-WebMvcConfigurer
+配置类的接口为WebMvcConfigurer
 
-tip: WebMvcConfigurer可以配置拦截器, 异常解析器, 参数解析器, 跨域规则
+🌙 WebMvcConfigurer可以配置拦截器, 异常解析器, 参数解析器, 跨域规则
 ```
 
-_前端为 SPA 应用时, SpringMvc 如何配置 ResourceHandler?_
-
+_前端为SPA(Single Page Application)时, SpringMVC 如何配置资源路径映射?_
 ```
-将大部分路径(/**)都映射到index.html, 如果有js或css需要单独配置
+将大部分路径(/**)都映射到index.html
 ```
 
-# 5. SpringBoot
+# 4. SpringBoot
 
 ## 1. 介绍
 
-_为什么要使用 Springboot?_
+_为什么要使用 SpringBoot?_
 
 ```
 使用第三方库的xxx-starter.jar包时可以自动注册bean, 无需手动注册
-
-tip: springmvc的starter中使用内嵌web容器, 默认依赖库为spring-boot-starter-tomcat
 ```
 
 ## 2. 实现原理
 
-_springboot 自动配置原理?_
-
+_SpringBoot 自动配置原理?_
 ```
 使用了类似于Java SPI的机制:
-读取三方jar包中的spring.facotries文件, 加载中文件列出的配置类并注册到容器, 配置类被ConditionOnXxx注解, 只有在符合条件时才被注册
+SpringBooth启动时读取三方jar包中的spring.facotries文件, 加载中文件列出的自动配置类, 配置类被@Conditional派生注解时只有在符合条件时才被注册为Bean
+
+🌙 检查是否符合条件时会使用@Conditional指明的Condition子类
+🌙 @Conditional注解原理为BeanFacotoryPostProcessor
 ```
 
-## 3. 配置文件
 
-_SpringBoot 如何导入额外的 yml 配置文件?_
 
-```
-在Bean上标注@PropertySource("db.yml")
-```
-
-_多环境配置文件如何设置?_
-
-```
-application.yml中设置spring.profiles.active: Xxx `启用从配置文件`application-Xxx.yml`
-```

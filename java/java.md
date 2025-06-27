@@ -217,9 +217,6 @@ Java7引入的语法糖, 在try代码块执行后可自动关闭Closeable
 🌟 JDK序列化: 实现Serializable, 使用ObjectOutputStream
 
 🌟 第三方库序列化: Gson, Jackson
-
-❓Gson和Jackson的区别
-👄Gson无法处理循环依赖的场景, 会抛出StackOverflowException
 ```
 
 **_transient 关键字的作用? serialVersionUID 的作用?_**
@@ -254,7 +251,7 @@ Java7引入的语法糖, 在try代码块执行后可自动关闭Closeable
 
 ***什么是Bridge方法***
 ```
-编译器自动生成的一个方法, 如果父类有带泛型参数的方法A(编译后参数类型为Object), 子类重写该方法并且没有带泛型参数得到方法B(编译后参数类型为Xxx), 则子类会生成一个桥接方法C, 方法C签名和方法A相同(参数类型都为Object), 但方法C进行类型转化但实际调用方法B
+编译器自动生成的一个方法, 如果父类有带泛型参数的方法A(编译后参数类型为Object), 子类重写该方法并且没有泛型参数得到方法B(编译后参数类型为Xxx), 则子类会生成一个桥接方法C, 方法C签名和方法A相同(参数类型都为Object), 但方法C进行类型转化但实际调用方法B
 
 🌙 可以通过Method#isBridge判断一个方法是否是桥接方法
 🌙 如果编译后方法B的参数类型和方法A相同, 则不会生成Bridge方法
@@ -279,13 +276,18 @@ SPI(Service Provider Interface)是Java提供的扩展机制, 可以在运行时�
 ```
 
 ## 8. JDK 高版本新特性
+***什么是函数式接口?***
+```
+🌟 函数式接口是只有一个方法待实现的接口
+🌟 @FunctionalInterface注解可以强制接口是否为函数式接口, 但非必需
+
+🌙 JDK中内置了一些常见的函数式接口:Function/Predicate/Consumer/Supplier
+```
 
 **_Java 中的 Lambda 表达式是什么? (JDK8)_**
 
 ```
-🌟 Lambda表达式是一个语法糖, Lambda表达式可以作为变量赋值给函数式接口Function
-
-🌟 Lambda表达式: (arg0, arg1) -> {statement}
+Lambda表达式是一个语法糖, Lambda表达式可以作为变量赋值给函数式接口Function
 ```
 
 **_Stream 常用的中间操作和终止操作有哪些? (JDK8)_**
@@ -294,6 +296,11 @@ SPI(Service Provider Interface)是Java提供的扩展机制, 可以在运行时�
 🌟终止操作有 forEach(), collect()
 ```
 
+***Optional API解决了什么问题?***
+```
+🌟 避免NPE: Optional强制进行空指针检查
+🌟 简化代码: 避免链式调用时冗长的null检查
+```
 
 ## 9. IO 和文件
 

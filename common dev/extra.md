@@ -159,6 +159,26 @@ _如何设置 Http 响应头让浏览器将响应体下载为附件?_
 Content-Disposition: attachment; filename="demo.pdf"
 ```
 
+## 5. 序列化
+*常见的序列化协议有哪些?*
+```
+🌟 JSON
+🌟 Thrift
+🌟 Protobuf
+
+🌙 JSON可读性最高, 但数据压缩度不高且性能差, 所以大型企业为了节省流量加快响应速度可能选用其他协议
+```
+*Gson/FastJson/Jackson的区别是什么?*
+```
+🌟 Gson: Google开源, 入口类Gson
+🌟 FastJson: Alibaba开源, 入口类Json
+🌟 Jackson: Spring序列化库, 入口类ObjectMapper
+
+🌙 Gson依赖反射实现, FastJson和Jackson依赖于getter/setter方法
+🌙 Gson没有解决循环依赖问题, 循环依赖会StackOverflow
+🌙 FastJson由于autoType机制导致漏洞多, 推荐FastJson2
+```
+
 # 3. 生活常识
 
 ## 1. 时间
