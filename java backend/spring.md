@@ -67,6 +67,14 @@ _BeanFactoryPostProcessor和BeanPostProcessor的区别?_
 🌙 先注册的BeanPostProcessor会对后续BeanPostProcessor的注册过程进行拦截, 所以进行依赖注入的BeanPostProcessor优先级很高
 ```
 
+*如何实现从配置中心获取属性并添加到Spring的环境中?*
+```
+使用EnvironmentPostProcessor
+
+🌙 EnvironmentPostProcessor不是Bean, Spring在启动时通过spring.factories SPI机制加载
+🌙 Spring启动时序为: EnvironmentPostProcessor执行 => 加载application.properties并将属性值合并到Environment中 => 包扫描获取Bean定义 => BeanFactoryPostProcessor回调执行
+```
+
 ## 3. 基于注解的开发
 
 _@Autowired 和 @Resource 的区别?_
