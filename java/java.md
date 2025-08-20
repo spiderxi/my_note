@@ -545,6 +545,11 @@ tip2: 使用String#intern()方法本质上是在用时间换空间
     "int i = new Integer(1)" 被编译为 "int i = new Integer(1).intValue()"
 ```
 
+***long.class和Long.class是同一个Class的对象吗?***
+```
+不是, 反射通过参数类型获取Method时, 两者视作不同的参数类型
+```
+
 **_为什么 `new Integer(11) == new Integer(11)`?_**
 
 ```
