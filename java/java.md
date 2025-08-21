@@ -6,6 +6,8 @@
 ```
 🌟 JDK(Java development kit) = JRE + Java开发工具(例如javac, javadoc)
 🌟 JRE(Java runtime enviroment) = 基于平台的JVM程序 + 动态链接文件 + 标准库class/jar文件 + 平台特有的class/jar 文件
+
+🌙 JVM = Java Virtual Machine(Java虚拟机), 可以加载类文件并执行代码, JVM隔离了不同平台的差异, 使得Write Once, Run Everywhere 
 ```
 
 **_什么是 OpenJDK?_**
