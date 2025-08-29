@@ -81,6 +81,18 @@ _常见开源协议的特点?_
 🌟 GPL: 必须以GPL协议开源自己的源码
 ```
 
+## 4. 云架构
+*PaaS和IaaS的区别?*
+```
+🌟 IaaS(Infrastructure as a Service): 硬件资源相关服务, 如网络防火墙服务, 虚拟机服务
+🌟 PaaS（Platform as a Service）: 基础软件相关服务, 如消息队列,关系型数据库,对象存储,图像识别
+```
+
+*什么是SLA?*
+```
+SLA = Service Level Agreement = 服务等级协议, 用于服务提供方声明服务质量(TP999, 可用性百分比, QPS, 数据延迟)和免责声明
+```
+
 # 2. 代码常识
 
 ## 1. RegExp
