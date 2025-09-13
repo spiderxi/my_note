@@ -98,8 +98,6 @@ ES使用乐观锁(版本号)控制并发修改
 🌟 推荐按id更新, update为增量更新(局部更新), index方式为全量更新
 ```
 
-******
-
 # 2. ES 查询
 
 ## 2.1 基本查询
@@ -107,14 +105,29 @@ ES使用乐观锁(版本号)控制并发修改
 **_Es 中常用的查询条件有哪些?_**
 
 ```
-* match_all: 全字段分词查询
-* match_query: 单字段分词查询
-* multi_match: 多字段分词查询
-* term: 单值精准匹配
-* terms: 多值精准匹配
-* range: 单字段范围匹配
-* ids: id精准匹配
-* geo_distance: 地理位置半径查询
+🌟 bool: 用于其他查询条件的逻辑复合
+🌟 match_all: 全字段分词查询
+🌟 match_query: 单字段分词查询
+🌟 multi_match: 多字段分词查询
+🌟 term: 单值精准匹配
+🌟 terms: 多值精准匹配
+🌟 range: 单字段范围匹配
+🌟 ids: id精准匹配
+🌟 geo_distance: 地理位置半径查询
+```
+
+***bool.query中must和filter的区别?***
+```
+两者都表示AND的逻辑关系, 区别在于must的字段会计算相关性得分, filter不会(score=0)
+
+🌙 filter因为不计算评分, 所以速度会更快
+```
+
+***bool.should查询如何指定最少满足条件的个数?***
+```
+设置minimum_should_match, 默认值为1
+
+🌙 如果没有should子句, minimum_should_match参数无效
 ```
 
 **_什么是 FunctionScoreQuery?_**
