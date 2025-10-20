@@ -160,7 +160,7 @@ error
 🌟 造成异常的业务对象
 🌟 异常提示文本
 
-🌙 如果日志输出时涉及字符串拼接或方法调用, 如logger.warn("warn:" + errorCode + e.getMessage()), 如要前置if判断logger.isWarnEnabled
+🌙 如果日志输出时涉及字符串拼接或方法调用, 如logger.warn("warn:" + errorCode + e.getMessage()), 要前置if判断logger.isWarnEnabled
 🌙 尽量使用参数化日志, 即logger.debug("param:{}", param)
 ```
 
@@ -174,14 +174,12 @@ error
 ***Log4j2的抽象层架构?***
 ```
 🌟 Logger: 检查日志级别, 封装日志事件委托给Appender
-🌟 Filter: 在日志事件到达 Appender 或 Logger 时进行过滤
 🌟 Appender: 指定输出目标和方式
 🌟 Layout: 定义日志事件的输出格式
+🌟 Filter: 在日志事件到达 Appender 或 Logger 时进行过滤
 
 🌙 如果需要扩展log4j2, 可以将上述抽象层接口实现类放到类路径下, 添加@Plugin注解, 并修改配置文件
-🌙 配置文件中可以配置多个logger/appender, 每个logger可以单独配置日志级别level和关联的appender
-🌙 使用slf4j获取Logger时如未指定名称兜底返回root logger
-🌙 一个logger可以关联多个appender, 不考虑filter的话所有appender都会输出日志
+🌙 一个logger可以关联多个appender, 所有appender都会输出日志
 🌙 内置的AsyncAppender可以实现异步输出日志大幅提高性能, AsyncAppender采用了生产者-消费者模型, append()时将日志事件放到阻塞队列中, 创建一个消费者线程批处理日志事件
 ```
 
