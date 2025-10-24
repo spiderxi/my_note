@@ -354,7 +354,7 @@ Write Ahead Log(WAL)思想:
 
 _为什么有了redo log还需要undo log?_
 ```
-undo log提供了对事务回滚和MVCC的支持
+undo log提供了对事务回滚和MVCC的支持, 保证了事务的原子性(要么全部都不执行)
 
 例如:
 一个事务修改了所有页面导致buffer pool中的部分脏页面必须在事务提交前刷新到磁盘上(steal策略), 此时如果没有undo log, 就会导致未提交事务的却修改了DB, 如果事务在之后提交不成功就会破坏事务的原子性
