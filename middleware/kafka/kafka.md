@@ -89,13 +89,6 @@ _讲一下生产者的retry-backoff机制?_
 🌙 retry-backoff机制时为了自动解决某些重试后能成功的异常(网络抖动, 主节点故障转移)
 ```
 
-_不开启幂等时, kafka如何保证消息的顺序?_
-```
-设置生产者单次连接最大在途请求数(max.in.flight.requests.per.connection)=1(不推荐, 会导致吞吐量下降)
-
-🌙 乱序场景: 假设生产者并发发送消息的顺序为A-B, B先ACK, A没有ACK, 此时故障转移, A重试后分区中消息顺序为B-A
-```
-
 _kafka的消息可以保证幂等吗?_
 ```
 可以, 在配置项中开启enable.idempotence
