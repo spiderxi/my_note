@@ -5,7 +5,7 @@
 _**Lucene 和 ES 的关系?**_
 
 ```
-ES使用Lucene全文搜索引擎
+ES底层使用Lucene全文搜索引擎
 ```
 
 _**什么是 Inverted Index?**_
@@ -54,7 +54,7 @@ text, keyword, long, integer, double, float, date, boolean
 
 ***什么是Nested字段?***
 ```
-Nested字段是一种特殊的嵌套类型, 相当于List<Document>
+Nested字段是文档嵌套类型, 类型相当于List<Document>
 ```
 
 ***ES查询结果中有哪些重要字段?***
@@ -95,14 +95,15 @@ Nested字段是一种特殊的嵌套类型, 相当于List<Document>
 ```
 ES使用乐观锁(版本号)控制并发修改
 
-🌟 推荐按id更新, update为增量更新(局部更新), index方式为全量更新
+🌟 推荐按id更新
+🌟 更新方式有两种: update为增量更新(局部更新), index方式为全量更新
 ```
 
 # 2. ES 查询
 
 ## 2.1 基本查询
 
-**_Es 中常用的查询条件有哪些?_**
+**_ES中常用的查询条件有哪些?_**
 
 ```
 🌟 bool: 用于其他查询条件的逻辑复合
@@ -133,20 +134,20 @@ ES使用乐观锁(版本号)控制并发修改
 **_什么是 FunctionScoreQuery?_**
 
 ```
-可以定义相关性得分的再计算函数func: 最终相关性得分 = func(相关性得分)
+可以自定义相关性得分的再计算函数func: 最终相关性得分 = func(相关性得分)
 
 🌙function_score_query如果使用随机权重可以实现每次分页查询结果都不同的效果
 🌙如果不指定任何排序规则, 默认按相关性得分排序
 ```
 
-***介绍一下Query Phase和Fetch Phase?***
+***介绍一下ES分页查询时的Query Phase和Fetch Phase?***
 ```
-ES的查询分为Query Phase和Fetch Phase
+ES的查询分为Query Phase和Fetch Phase:
 🌟 Query Phase: 协调节点将查询路由到多个数据节点数, 据节点根据倒排索引(分词查询和匹配查询)/BKD树索引(范围查询)过滤出"_id", 并根据bool逻辑取并集或交集, 将过滤后的文档部分字段("_id"和"_score")返回协调节点
+
 🌟 Fetch Phase: 协调节点进行归并排序, 确定结果页后根据"_id"从数据节点获取完整数据
 
 🌙 Query Phase时数据节点会进行TopK排序, Fetch Phase时协调节点仅进行K路归并排序
-🌙 如果为聚合查询聚合方式和排序类似, 数据节点进行初步聚合, 协调节点最终聚合
 ```
 
 
@@ -234,11 +235,11 @@ TF-IDF的改进, 相关性得分额外考虑了文本长度
 2️⃣ tokenizer: 分词
 3️⃣ tokenizer filter: 对词语进行后处理
 
-🌙 可以通过组合三个部分来实现复杂的分词, 例如常见的type="completion"字段使用的分词器
+🌙 可以通过组合三个部分来实现复杂的分词, 例如类型为"completion"的字段(支持自动补全)使用的分词器
 为{tokenizer = "ik_max_word", tokenizer filter="pinyin"}
 ```
 
-## 2.4 Suggester
+## 2.4 Suggest查询
 
 **_ES 中常用的 Suggester 类型有哪些?_**
 
