@@ -1,82 +1,71 @@
 # 1. 并发编程简介
 
-## 1. 基础理论
+## 基础理论
 
 ***并发和并行的区别?***
+```
+🌟 并发指一个时间段内多个任务同时进行, 但在任一时刻只有一个任务进行
+🌟 并行指任意时刻有多个任务进行
+```
 
-* 并发指一个时间段内多个任务同时进行, 但在任一时刻只有一个任务进行
-* 并行指任意时刻有多个任务进行
 
 ***并发编程(线程安全)三大问题是什么?***
-
-* 原子性: 确保自增自减等操作的原子性 `(Java中除了对long/double的写操作不是原子的, 其他所有单次读写操作都是原子的)`
-* 可见性: 先进行的操作对后进行的操作可见
-* 有序性
-
-***什么是死锁, 死锁的四个必要条件是什么?***
-
-死锁: 锁的等待链形成环导致环中每个线程/进程都永久阻塞
-
-四个必要条件:
-
 ```
-* 锁互斥
-* 锁不可剥夺
-* 占有锁且等待锁
-* 循环等待锁
+🌟 原子性: 操作要么全发生要么全不发生
+🌟 可见性: 先进行的操作对后进行的操作可见
+🌟 有序性: 单线程中会存在指令重排序, 在多线程下需要保证重排序不会改变语义
+
+🌙 JVM中, 除long和douebl单次读写变量都是原子的
 ```
 
-## 2. 线程
+## 线程
 
 ***进程, 线程, 协程的区别?***
-
 ```
-* 进程: 操作系统内存, CPU时间片等资源分配的基本单位
-* 线程(Java中的Thread): 多个线程共享给进程分配的资源, 但每个线程执行时拥有独立的栈和CPU核心(CPU核心中寄存器中的内容和栈称为线程上下文)
-* 协程(Java中的Fiber): 多个协程共享线程的CPU核心, 协程调度通过应用程序实现
-```
+🌟 进程: 操作系统内存/CPU时间片等资源分配的基本单位
+🌟 线程(Java中的Thread): 多个线程共享给进程分配的资源, 一个线程执行时拥有独立的栈和CPU核心
+🌟 协程(Java中的Fiber): 多个协程共享线程的CPU核心, 协程调度通过应用程序实现
 
-***内核级线程和用户级线程的区别?***
-
-```
-内核级线程: 操作系统内核中的线程(又称Task), 每个内核级线程执行时会被分配给一个CPU核心的时间片
-
-用户级线程: 应用程序虚拟出来的线程, 实际上多个用户级线程共享一个内核级线程的执行核心
-
-Java线程具体是内核级还是用户级线程取决于JVM, 普遍的JVM采用内核级线程
+🌙 一次线程上下文切换约为10微秒, 一次协程切换时间0.1微秒
 ```
 
 ***为什么切换线程比切换进程快, 切换协程比线程快?***
-
 ```
-进程切换时需要额外切换:  页表(将虚拟地址映射到主存上新进程的物理地址),   切换了页表会造成缓存失效, 缓存命中率降低
+🌟 切换时进程需要额外切换内存管理上下文(切换页表), TLB失效导致内存访问变慢
 
-切换协程不用进入操作系统内核态, 进入内核态需要保存线程断点且加载操作系统系统调用的上下文, 所以更快
-```
-
-***什么情况下使用协程/线程/进程?***
-
-* 协程使用场景: IO密集型的并发任务, 当一个协程正在IO阻塞时, 可以最快速地切换到其他协程并执行
-* 线程使用场景: 并发任务之间需要共享资源/进行通信, CPU密集型任务(充分利用多核CPU的并发能力)
-* 进程使用场景: 并发任务之间需要资源不共享, 需要保证各个任务的安全性
-
-***线程的五态模型, 状态之间如何转换的?***
-
-```
-new ->(start函数) ready ->(被调度) running
- ->(wait等函数, io开始) blocked ->(io结束, notify) running ->  dead
+🌟 切换线程时需要进入操作系统内核态, 需要切换线程上下文(CPU寄存器)
 ```
 
-***为什么要使用线程池?***
+***JVM的线程有哪些状态?***
+```
+🌟 NEW: 线程对象已创建，但尚未调用 start()
+🌟 RUNNABLE: 已调用start()
+🌟 BLOCKED: 因monitor锁被动阻塞状态, 如synchronized
+🌟 WAITING / TIMED_WAITING: 主动阻塞等待被唤醒或等待超时, 如wait()/park()
+🌟 TERMINATED: run()方法执行结束
 
-* 使用线程池: 避免频繁创建和销毁线程造成的开销,  便于统一管理线程
+🌙 线程池中的idle线程处于WAITING状态
+```
 
-## 3. 锁
+
+## 锁
+***什么是死锁?***
+```
+锁的等待链形成环导致环中每个线程/进程都永久阻塞
+```
+
+***死锁的四个必要条件是什么?***
+```
+🌟 锁互斥
+🌟 锁不可剥夺
+🌟 占有锁且等待锁
+🌟 循环等待锁
+```
 
 ***乐观锁和悲观锁的区别?***
 
 ```
-🌟乐观锁读数据不加锁, 写数据时通过版本号判断是否冲突, 冲突则
+🌟乐观锁读数据不加锁, 写数据时通过版本号判断是否冲突, 冲突需进行处理(重试/抛出异常)
 🌟悲观锁读写数据过程中加互斥锁
 
 🌙 悲观锁适合频繁发生并发冲突的场景
@@ -96,21 +85,20 @@ new ->(start函数) ready ->(被调度) running
 
 # 2. Java并发编程
 
-## 1. Thread
+## 线程使用
 
 ***创建一个线程的方式有哪些?***
 
 ```
-🌟 继承Thread
+🌟 继承Thread类
 🌟 使用Runnable构造Thread
 ```
 
 ***线程常用的API有什么?***
-```java
-Thread.currentThread();
-Thread.sleep(1000);
-thread.setName("thread name");
-thread.setPriority(Thread.MAX_PRIORITY);
+```
+🌟 获取当前线程对象: Thread.currentThread();
+🌟 主动进入TIMED_WAITING状态: Thread.sleep(1000);
+🌟 设置线程竞争优先级: Thread#setPriority(Thread.MAX_PRIORITY);
 ```
 
 ***如何获取线程栈快照?***
@@ -118,16 +106,9 @@ thread.setPriority(Thread.MAX_PRIORITY);
 使用JDK工具 jstack <pid>
 ```
 
-***Thread.sleep(1)的作用?***
-```
-让出当前线程的 CPU 时间片，给其他线程或进程运行机会
-```
-
 ***线程池的submit()和execute()的区别?***
-
 ```
-🌟 submit()入参为Runnable和Callable, execute()入参只能为Runnable
-🌟 submit()有返回值Future<?>, 不会吞掉异常, execute()无返回值且会吞掉异常
+submit()有返回值Future<?>, 不会吞掉异常, execute()无返回值且会吞掉异常
 
 🌙 最佳实践: 无特殊需求一律使用submit(), execute()为JDK向下兼容设计
 ```
@@ -135,72 +116,37 @@ thread.setPriority(Thread.MAX_PRIORITY);
 ***一般来说一个JVM进程能同时启动多少个线程?***
 ```
 线程数量和Memory和操作系统限制有关, 线上4GB内存一般线程数1k~5k
+
+🌙 默认一个线程需要申请1MB栈空间, 所以4GB内存的线程数量上限为4096
 ```
 
-## 2. 线程通信
+## 线程通信
 
 ***Java中如何保证线程安全?***
-
-java中使用**synchronized/lock/volatile**等机制保障原子性, 可见性, 有序性,   从而保障线程安全
+```
+使用synchronized/lock等锁, 和volatile等机制保障原子性, 可见性, 有序性
+```
 
 ***Java中多线程协作的API有哪些?***
 
-```java
-obj.wait()
-obj.notify()
-thread.join();
-Thread.yield()
-Thread.sleep()
-JUC中的Condition提供的condition.await(); condition.signal();
-JUC提供的同步工具类 CountDownLatch CyclicBarrier Semaphore
+```
+🌟 Object#wait() Object#notify() Object#notifyAll()
+🌟 Thread#join() Thread.sleep()
+🌟 synchronized Lock#lock()
 ```
 
-***如何实现一个生产者消费者模式的两个线程?***
+## Java Memory Model
 
-使用synchronized+List+notifyAll + wait实现
-
-## 3. Java Memory Model
-
-***讲一下JMM?***
-
-JMM全称Java内存模型, JMM定义了Java多线程编程下相关概念的抽象, **用于屏蔽底层硬件细节(包括重排序, 缓存模型)**
-
-JMM定义了:
-
+***讲一下Java Memory Model?***
 ```
-* 工作内存: 每个线程的私有缓存, 保存了该线程的数据副本, 对应L1/L2缓存
-* 主内存: 存储线程共享的数据, 对应主存
-* volatile: 保证了对变量操作的可见性
-* synchornized: 保证了操作的原子性和可见性
+JMM全称Java内存模型, JMM定义了并发编程下JVM需要遵循的抽象, 用于屏蔽底层硬件细节:
+🌟 工作内存: 每个线程的私有缓存, 保存了该线程的数据副本, 对应硬件L1/L2缓存
+🌟 主内存: 存储线程共享的数据, 对应Memory
+🌟 volatile: 保证了对变量操作的可见性
+🌟 synchornized: 保证了操作的原子性和可见性
 ```
 
-## 4. Load Store Fence
-
-***重排序分为哪两种?造成重排序的原因是什么?***
-
-重排序分为指令重排序和内存重排序
-
-* 指令重排序 `(又细分为编译器重排序和CPU重排序)`**是为了提高执行效率, 但不会改变程序在单线程下的语义**
-* 内存重排序是由于使用了CPU缓存和缓存的读写缓冲器造成的**读写延迟** `(读写延迟具体会造成LoadLoad, StoreStore, LoadStore, StoreLoad重排序)`
-
-***什么是Happens-Before原则?***
-
-虽然编译器会对指令进行重排序, 但重排序遵循一些Happens-Before规则以**保障并发编程的正确性**
-
-***内存屏障指令是什么, Java中的内存屏障指令有哪些?***
-
-CPU提供了内存屏障指令用来阻止内存屏障指令前后的指令重排序
-
-Java对硬件的内存屏障指令进行了抽象, 分为四种内存屏障指令:
-
-```
-LoadLoad
-StoreStore
-LoadStore
-StoreLoad
-```
-
-## 5. synchronized
+## synchronized
 
 ***synchronized如何使用?***
 
@@ -242,7 +188,7 @@ ObjectMonitor保存了竞争锁的线程集合Entry Set, 当前持有线程和�
 
 重量级锁: `获取锁时进入操作系统内核态, 获取锁失败时直接切换线程上下文`
 
-## 6. volatile和CAS
+## volatile和CAS
 
 ***volatile实现原理?***
 
@@ -266,7 +212,7 @@ ABA问题无法确保数据在锁定期间被写入, 只能保障数据和期望
 
 # 3. JUC
 
-## 1. Lock&Condition
+## Lock
 
 ***Lock和Synchronized的区别有哪些?***
 
@@ -284,7 +230,7 @@ c.await()
 c.singal()
 ```
 
-## 2. JUC工具类
+## JUC工具类
 
 ***CountDownLatch和CyclicBarrier的区别?***
 
@@ -292,7 +238,7 @@ CountDownLatch: `CountDownLatch用于一个线程等待其他多个线程执行�
 
 CyclicBarrier: `CyclicBarrier用于多个线程之间互相在同步点等待`
 
-## 3. ThreadLocal
+## ThreadLocal
 
 ***讲一下ThreadLocal实现原理?***
 
@@ -302,79 +248,63 @@ get()方法调用时, 会获取当前线程对象的 `ThreadLocalMap` , map中�
 
 使用线程池中的线程时, 如果忘记 `remove()` 会造成内存泄漏
 
-## 4. Thread Pool
+## 线程池
+
+***为什么需要使用线程池而不是直接创建线程实例?***
+```
+🌟 便于统一管理
+🌟 资源池化思想, 避免频繁创建和销毁线程的开销
+```
 
 ***JUC线程池相关抽象架构?***
 ```
-🌟 Executor: 线程池顶级抽象定义了execute()方法
-🌟 ExecutorService: 继承Executor提供submit()方法
-🌟 Future<?>/CompletionStage<?>: 函数式异步编程抽象, 提供thenApply() get()等方法
-🌟 BlockingQueue<?>: 阻塞队列抽象
-🌟 Callable<?>/Runnable: 任务抽象
+🌟 Executor: 线程池顶级抽象, 定义了execute()方法
+🌟 ExecutorService: 继承Executor, 异步编程线程池抽象
+🌟 Future / CompletableFuture: 异步编程抽象
+🌟 BlockingQueue: 阻塞队列抽象
+🌟 Callable / Runnable: 任务抽象
 ```
 
-***JUC Executors提供的线程池有哪些?***
+***创建线程池ThreadPoolExecutor的参数有哪些?***
 
 ```
-固定大小的线程池: Executors.newFixedThreadPool
-动态大小的线程池: Executors.newCachedThreadPool()
-单线程的线程池: Executors.newSingleThreadExecutor()
+🌟 核心线程数
+🌟 最大线程数
+🌟 拒绝策略: 
+🌟 阻塞队列
+🌟 空闲线程存活时间
+🌟 线程工厂
 ```
 
-***创建线程池的参数有哪些, 各自含义?***
+***线程池提交任务后的执行流程?***
 
 ```
-* 核心线程数: 常驻的线程数量
-* 最大线程数
-* 空闲线程存活时间: 当线程数量大于核心线程数时, 线程空闲多长就被销毁
-* 阻塞队列: 待执行的任务的阻塞队列
-* 线程工厂
-* 拒绝策略
+1️⃣ 如果当前线程数 < 核心线程数, 新建线程并执行任务
+2️⃣ 如果当前线程数 >= 核心线程数, 将任务放入阻塞队列
+3️⃣ 如果最大线程数 >= 当前线程数 >= 核心线程数并且阻塞队列已满, 新建线程执行任务
+4️⃣ 如果当前线程数 > 最大线程数, 执行拒绝策略
+
+🌙 如果线程数 > 核心线程数 并且 idle时间 > 空闲线程存活时间, 线程会被销毁
+🌙 需要结合业务合理地配置拒绝策略 (常见策略: 抛出异常 / 直接丢弃任务)
+🌙 注意LinkedBlockingQueue阻塞队列的OOM风险
 ```
 
-***如何设置线程池的参数?***
-
-核心线程数
-
+***如何设置线程池的核心线程数?***
 ```
-* 针对 IO 密集型：线程池的核心线程数量要相对较多，约等于 CPU 核心数*2。
-
-* 针对计算密集型：线程池的核心数量尽量要少，约等于 CPU 的核心数。
-```
-
-选用什么阻塞队列看业务
-
-```
-使用不定长的阻塞队列要确保高并发时不会OOM
-```
-
-***拒绝处理策略有哪些?***
-
-```
-直接抛出异常: AbortPolicy
-直接丢弃任务: DiscardPolicy
-丢弃队列中最老的任务: DiscardOldestPolicy
+🌟 针对IO密集型：核心线程数 = CPU核心数 * 2, 例如RPC调用/网络IO
+🌟 针对计算密集型：核心线程数 = CPU核心数 + 1, 例如图像处理
 ```
 
 ***常见的阻塞队列有哪些?***
 
 ```
-基于数组的有界阻塞队列: ArrayBlockingQueue
-基于链表的无界/有界阻塞队列: LinkedBlockingQueue
-待优先级的阻塞队列: PriorityBlockingQueue
-延迟阻塞队列: DelayQueue
+🌟 数组阻塞队列: ArrayBlockingQueue
+🌟 链表阻塞队列: LinkedBlockingQueue
+🌟 优先级阻塞队列: PriorityBlockingQueue
+🌟 延迟阻塞队列: DelayQueue
 ```
 
-***线程池submit后的流程?***
-
-```
-1. 如果当前线程数 < 核心线程数, 新建线程并执行任务
-2. 如果当前线程数 >= 核心线程数, 将任务放入阻塞队列
-3. 如果最大线程数 >= 当前线程数 >= 核心线程数并且阻塞队列已满, 新建线程执行任务
-4. 如果当前线程数 > 最大线程数, 执行拒绝策略
-```
-
-## 5. AQS
+## AQS
 
 ***讲一下AQS的原理和核心思想?***
 
@@ -396,7 +326,7 @@ Semaphore中的Sync
 
 共享锁: 重写 `tryAcquireShared` 和 `tryReleaseShared` 方法CAS(state+1, state)
 
-## 6. Concurrent Queue
+## Concurrent Queue
 
 ***无阻塞队列ConcurrentLinkedQueue实现原理?***
 
