@@ -117,10 +117,10 @@ submit()有返回值Future<?>, 不会吞掉异常, execute()无返回值且会�
 ```
 线程数量和Memory和操作系统限制有关, 线上4GB内存一般线程数1k~5k
 
-🌙 默认一个线程需要申请1MB栈空间, 所以4GB内存的线程数量上限为4096
+🌙 默认一个线程需要申请1MB栈空间, 所以4GB内存的理论线程数量上限为4096
 ```
 
-## 线程通信
+## 线程协作
 
 ***Java中如何保证线程安全?***
 ```
@@ -135,7 +135,7 @@ submit()有返回值Future<?>, 不会吞掉异常, execute()无返回值且会�
 🌟 synchronized Lock#lock()
 ```
 
-## Java Memory Model
+## JMM
 
 ***讲一下Java Memory Model?***
 ```
@@ -148,67 +148,53 @@ JMM全称Java内存模型, JMM定义了并发编程下JVM需要遵循的抽象, 
 
 ## synchronized
 
-***synchronized如何使用?***
-
-修饰静态方法时锁对象为Class对象, 修饰成员方法时锁对象为 this, 同步代码块中可以自己指定锁对象
-
-```java
-                synchronized (lock) {
-                    while (curThreadId != 1) lock.wait();
-                    System.out.println("thread1!");
-                    lock.notifyAll();
-                }
+***synchronized代码块锁的对象可以是什么?***
+```
+🌟 修饰静态方法时锁对象为Class对象
+🌟 修饰成员方法时锁对象为 this
+🌟 同步代码块中可以自己指定锁对象
 ```
 
-***synchronized的作用, 原理是什么?***
-
-synchronized等价于在同步代码块前后添加了**内存屏障和两条指令** `monitorEnter/ monitorExit`, 这两条指令操作的是的 `对象头中的Markword的锁指针指向的ObjectMonitor`
-
-```Java
-monitorEnter
-(内存屏障, 将主内存数据刷新到工作内存)
-// 同步代码块
-monitorExit
-(内存屏障, 将工作内存的数据刷新到主内存)
+***synchronized的原理是什么?***
 ```
+synchronized等价于在同步代码块前后添加了两条字节码指令monitorEnter/monitorExit, 这两个指令获取对象头中的指针指向的ObjectMonitor对象, 进行锁操作
 
-ObjectMonitor保存了竞争锁的线程集合Entry Set, 当前持有线程和锁计数, 等待锁的线程集合Wait Set
-
-![1692086023645](image/java并发/1692086023645.png)
+🌙 ObjectMonitor保存了竞争锁的线程集合, 当前持有线程和锁计数, 等待锁的线程集合
+```
 
 ***synchronized锁升级过程是怎样的?***
-
 ```
+JVM级别synchronized锁进行了优化, 可以理解为一个自适应算法, 根据实际锁冲突情况使用不同类型的锁优化性能:
 无锁 -> 偏向锁 -> 轻量级锁 -> 重量级锁
+
+🌙 偏向锁: 记录锁偏向的线程, 单次CAS判断即可, 偏向线程不变则不需要切换线程上下文, 偏向线程改变则升级
+🌙 轻量级锁: CAS自旋锁, 获取锁成功时不需要切换线程上下文, 获取锁冲突则锁升级
+🌙 重量级锁: 强制切换线程上下文用于获取锁
+🌙 JDK15+默认禁用了偏向锁
 ```
-
-偏向锁: `记录锁偏向的线程, 如果获取锁时通过CAS发现锁偏向的线程是当前线程, 则不加锁, 否则升级为轻量级锁`
-
-轻量级锁: `尝试通过CAS+自旋一定次数获取锁, 如果获取锁失败, 则升级为重量级锁`
-
-重量级锁: `获取锁时进入操作系统内核态, 获取锁失败时直接切换线程上下文`
 
 ## volatile和CAS
 
 ***volatile实现原理?***
-
-使用了**内存屏障**保证了对volatile变量的写入, 会立刻从工作内存刷新到主内存, 对volatile变量的读取, 会先从主内存中读取到工作内存
-
-***什么是CAS, CAS实现原理?***
-
-CPU提供的硬件指令, 可以原子地进行compare and swap操作 `(比试结果相同时则写入, 否则不做操作)`
-
-CAS硬件的实现原理
-
 ```
-* 锁定总线: 当读取完数据后直接锁定总线, 比较完成, 写入数据时才解锁总线
-
-* MESI缓存一致性协议: 这个协议保证了当一个核心的缓存被写入时, 其他核心的缓存会失效
+使用了内存屏障指令保证了对volatile变量的写入, 会立刻从工作内存刷新到主内存, 对volatile变量的读取, 会先从主内存中读取到工作内存
 ```
 
-***CAS会有什么问题, 如何解决?***
 
-ABA问题无法确保数据在锁定期间被写入, 只能保障数据和期望的一致, **使用版本号解决ABA问题**
+***CAS实现原理?***
+```
+CPU提供的硬件指令, 可以原子地进行compare and swap操作, 比较结果相同时则写入, 否则不做操作
+
+🌙 早期CPU使用总线锁保证原子比较和写入, 但性能差
+🌙 现代CPU在执行 CAS 时，通过对缓存行加锁（cache locking）来避免总线锁定
+🌙 硬件层面通过MESI缓存一致性协议保证多核CPU之间的缓存一致, 从而为缓存行锁提供支持
+```
+
+***CAS的ABA问题如何解决?***
+```
+ABA问题无法确保数据在锁定期间被写入能保障数据和期望的一致, 使用版本号解决ABA问题
+```
+
 
 # 3. JUC
 
@@ -217,36 +203,26 @@ ABA问题无法确保数据在锁定期间被写入, 只能保障数据和期望
 ***Lock和Synchronized的区别有哪些?***
 
 ```
-* Lock可以是公平锁,  Synchornized只能是非公平锁
-* Synchornized内部有异常会自动释放锁, Lock不会
-* Lock更灵活, 可以使用tryLock(), 即使获取不到锁也不会阻塞, 也可以使用Condition进行更细粒度的唤醒
+🌟 Lock可以是公平锁,  Synchornized只能是非公平锁
+🌟 Synchornized内部有异常会自动释放锁, Lock不会
+🌟 Lock更灵活, 可以使用tryLock(), 即使获取不到锁也不会阻塞, 也可以使用Condition进行更细粒度的唤醒
 ```
-
-***Condition如何使用?***
-
-```java
-Condition c = lock.newCondition();
-c.await()
-c.singal()
-```
-
-## JUC工具类
-
-***CountDownLatch和CyclicBarrier的区别?***
-
-CountDownLatch: `CountDownLatch用于一个线程等待其他多个线程执行完成, 内部是一个倒数计数器 `
-
-CyclicBarrier: `CyclicBarrier用于多个线程之间互相在同步点等待`
 
 ## ThreadLocal
 
 ***讲一下ThreadLocal实现原理?***
+```
+get()方法调用时, 会获取当前线程对象绑定的ThreadLocalMap , map中的key是ThreadLocal对象的弱引用, 值是当前线程的副本值
 
-get()方法调用时, 会获取当前线程对象的 `ThreadLocalMap` , map中的key是 `ThreadLocal` 的**弱引用**, 值是当前线程的副本值
+🌙 使用弱引用的目的是便于ThreadLocal对象的回收
+```
+
 
 ***使用ThreadLocal会有什么问题, 如何解决?***
+```
+使用线程池中的线程时, 如果忘记remove()会造成内存泄漏
+```
 
-使用线程池中的线程时, 如果忘记 `remove()` 会造成内存泄漏
 
 ## 线程池
 
@@ -306,28 +282,18 @@ get()方法调用时, 会获取当前线程对象的 `ThreadLocalMap` , map中�
 
 ## AQS
 
-***讲一下AQS的原理和核心思想?***
-
-AQS内部维护一个 `通过双向链表实现的FIFO队列` 和一个 `volatile int 的state变量`
-
-* 当线程获取锁时 `(acquire)` 会调用抽象方法 `tryAcquire`尝试获取锁, 获取锁时使用 `CAS` 改变state变量, 如果获取锁失败会将线程插入队列
-
-***JUC中哪些类使用了AQS?***
-
+***讲一下AQS(AbstractQueuedSynchronizer)的内部实现?***
 ```
-CountDownLatch中的静态内部类Sync
-ReentrantLock中的FairSync和NonFairSync
-Semaphore中的Sync
+AQS是JUC中的一个核心同步器框架, 可以通过实现抽象方式实现自定义的同步器, 内部实现为:
+
+AQS内部维护一个通过双向链表实现的FIFO队列和一个volatile int 的state变量, 加锁时通过CAS改变state变量, 如果获取锁失败会将线程插入队列
+
+🌙 CountDownLatch, ReentrantLock都基于AQS实现
 ```
 
 ***如何使用AQS实现独占锁和共享锁, 如何基于AQS实现自己的锁控制?***
+```
+🌟 独占锁: 重写acquire和release方法, 独占锁CAS(0, 1)
 
-独占锁: 继承AQS重写 `tryAcquire` 和  `tryRelease` 方法, 独占锁CAS(0, 1)
-
-共享锁: 重写 `tryAcquireShared` 和 `tryReleaseShared` 方法CAS(state+1, state)
-
-## Concurrent Queue
-
-***无阻塞队列ConcurrentLinkedQueue实现原理?***
-
-***阻塞队列ArrayBlockingQueue实现原理?***
+🌟 共享锁: 重写acquireShared和releaseShared方法CAS(state+1, state)
+```
