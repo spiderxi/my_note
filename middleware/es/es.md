@@ -141,6 +141,11 @@ ES使用乐观锁(版本号)控制并发修改
 🌙如果不指定任何排序规则, 默认按相关性得分排序
 ```
 
+***查询包含sort条件和match等打分条件时怎么排序?***
+```
+优先按照sort条件排序, sort一样才按文档得分排序
+```
+
 ***介绍一下ES分页查询时的Query Phase和Fetch Phase?***
 ```
 ES的查询分为Query Phase和Fetch Phase:
