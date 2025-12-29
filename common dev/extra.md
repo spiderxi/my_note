@@ -192,6 +192,7 @@ Content-Disposition: attachment; filename="demo.pdf"
 🌟 JSON
 🌟 Thrift
 🌟 Protobuf
+🌟 Hessian
 
 🌙 JSON可读性最高, 但数据压缩度不高且性能差, 所以大型企业为了节省流量加快响应速度可能选用其他协议
 ```
@@ -204,6 +205,11 @@ Content-Disposition: attachment; filename="demo.pdf"
 🌙 Gson依赖反射实现, FastJson和Jackson依赖于getter/setter方法
 🌙 Gson没有解决循环依赖问题, 循环依赖会StackOverflow
 🌙 FastJson由于autoType机制导致漏洞多, 推荐FastJson2
+```
+
+*Hessian序列化后二进制流包含哪些信息?*
+```
+全类名 + 字段名 + 枚举名(如果为枚举类) + 字段类型 + 字段值
 ```
 
 # 3. 生活常识
