@@ -20,9 +20,9 @@ ctrl+k     |  Right
 ctrl+o | move caret to next word with selection
 ctrl+i     |  Up
 ctrl+m     |  Down
-ctrl+h     |  Move caret To line head
+ctrl+h     |  Move caret To line home
 ctrl+;     |  Move caret To line end
-ctrl+l     |  expand line selection
+ctrl+l     |  extend line selection
 ctrl+g     |  go to line
 
 ctrl+点击/d  |  Go To Declaration Or Usage
