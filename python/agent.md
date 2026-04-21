@@ -21,3 +21,24 @@
 ```
 MCP是LLM集成Tool的通信协议(类似 HTTP 之于 Web), 由服务提供者提供MCP Server(本质是一个适配器)
 ```
+
+*当前(2026Q2)Agent主流开发框架有哪些?*
+```
+🌟 langchain / langgraph
+
+🌙 langchain链式调用封装度高, 适合中小型agent; langgraph更底层并支持图控流程
+```
+
+# 2. Agent IO模块
+*LLM服务商提供的API接口协议?*
+```
+一般提供对话型API, 入参示例为:
+[
+    {"role": "system", "content": "你是 Kimi"},
+    {"role": "user", "content": "1+1等于多少？"}
+]
+
+🌙 各种提示词工程, 其实质是控制模型在预测时能看到的前文上下文
+🌙 最终LLM看到的上下文, 实际上是拼接后的对话文案(含分隔符Token), LLM回归地预测下一个token:
+<分隔toekn> system: 你是 Kimi <分隔toekn> 
+```
