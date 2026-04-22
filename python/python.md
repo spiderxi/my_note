@@ -95,7 +95,7 @@ python支持多继承, 使用MRO(method resolve order)解决method冲突问题, 
 🌟 __dict__: obj.__dict__返回一个字典, key=属性名, value=值, 可动态修改
 ```
 
-**为什么hasattr(obj, "method")返回true?**
+**为什么hasattr(obj, "method")返回True?**
 ```
 方法本质上是类的属性，其值是一个函数对象(method类实例)
 
@@ -166,7 +166,7 @@ Exception
 
 # 3. 标准库
 ## 基本类型
-**python中常用的类型有哪些?**
+**python中常用的内置类型有哪些?**
 ```
 🌟 int float bool None
 🌟 list str set
@@ -177,9 +177,9 @@ Exception
 🌙 初始化时 1,2 = tuple类型 {"name": "klein"} = dict类型
 ```
 
-**基本类型也继承自object吗?**
+**内置类型也继承自object吗?**
 ```
-python中所有类型都继承自object, 包括基本类型
+python中所有类型都继承自object, 包括内置类型
 ```
 
 ## 模块
