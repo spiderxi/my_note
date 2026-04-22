@@ -2,7 +2,7 @@
 
 **Python和C++/Java的主要区别？**
 ```
-🌟C++/Java是强类型语言， Python不是
+🌟C++/Java是强类型语言， Python是动态类型语言
 🌟Java编译成字节码运行在JVM并支持JIT， Python直接逐条被解释器并执行
 🌟C++手动管理内存， Java和Python都支持GC
 🌙Python缩进是语法的一部分, C++/Java不是
@@ -13,7 +13,7 @@
 **python和pip和conda的区别？**
 ```
 🌟原生python仅包含标准库
-🌟pip和conda两者都为python包管理工具， conda额外支持环境管理
+🌟pip和conda两者都为python包管理工具， conda额外支持环境(venv)管理
 
 🌙 miniconda = conda + 一些预装包
 ```
@@ -43,14 +43,9 @@
 ```
 object
 
-🌙 id(obj)可以获取对象地址
-🌙 使用type(obj) isinstance(obj, ClassName)检查类型
-🌙 type(obj) 的返回值本身也是type类的实例
-```
-
-**怎么获取实例的hash值?**
-```
-hash(obj)或obj.__hash__()
+🌙 内置函数id(obj)可以获取对象地址
+🌙 使用内置函数type(obj) isinstance(obj, ClassName)检查类型
+🌙 type(obj) 的返回值本身也是"type"类的实例
 ```
 
 **==和is比较的是值还是地址?**
@@ -82,7 +77,7 @@ python支持多继承, 使用MRO(method resolve order)解决method冲突问题, 
 🌟 对象生命周期相关: __init__()
 🌟 属性访问控制: __setattr__()  __getattribute__() __getattr__()
 🌟 运算符重载: __add__() __eq__()
-🌟 duck typing相关: __str__() __call__()
+🌟 duck typing相关: __str__() __call__() __hash__()
 
 🌙 获取属性时优先调用__getattribute__(), __getattr__()仅在属性不存在时调用, 动态返回属性值
 ```
@@ -97,7 +92,7 @@ python支持多继承, 使用MRO(method resolve order)解决method冲突问题, 
 
 **为什么hasattr(obj, "method")返回True?**
 ```
-方法本质上是类的属性，其值是一个函数对象(method类实例)
+方法本质上是类的属性，其值是一个函数对象("method"实例)
 
 🌙 类内部的方法type=method, 外部定义的函数type=function
 ```
@@ -106,7 +101,7 @@ python支持多继承, 使用MRO(method resolve order)解决method冲突问题, 
 ```
 对象内部维护magic variable, 可动态读取/修改
 
-🌙 实际反射时不用直接读写magic variable, 提供了反射方法如getattr(p, "name"), 底层调用__getattribute__(), 最终从__dict__读取
+🌙 实际反射时不用直接读写magic variable, 提供了内置方法如getattr(p, "name"), 底层调用__getattribute__(), 最终从__dict__读取
 ```
 
 ## 异常处理
@@ -125,7 +120,7 @@ Exception
 ## 函数与装饰器
 **装饰器的核心思想是什么?**
 ```
-装饰一个可调用对象method/type, 返回一个增强版本
+装饰method/type, 返回一个增强版本
 
 🌙 使用@Xxx来使用装饰器Xxx
 🌙 装饰器装饰method可实现aop
@@ -134,11 +129,9 @@ Exception
 
 **装饰器的本质是什么?**
 ```
-装饰器本质上是一个function, 这个function入参为function/method, 内部定义一个增强后的function/method, 然后返回
+装饰器本质上是一个function, 这个function入参为function/type, 内部定义一个增强后的function/type, 然后返回
 
-🌙 语法糖"@decorator"装饰"def func()"时, 相当于先def func(), 然后func = decorator(func)
-🌙 装饰器支持参数, 装饰器"@repeat(3)"装饰"def func()"时, 相当于先def func(), 然后调用repeat(3)获取内部repeat_decorator, 
-然后func = repeat_decorator(func)
+🌙 语法糖"@decorator"装饰"def func()"时, 可以理解为先def func(), 然后func = decorator(func)
 ```
 
 **函数的各种传参方式的声明顺序?**
@@ -154,18 +147,20 @@ Exception
 
 **lambda表达式是什么**
 ```
-快速声明函数变量的一种方式, 例如func = lambda 参数1,参数2:表达式
+快速声明函数变量的一种方式
+
+🌙 例如func = lambda 参数1,参数2:表达式
 ```
 
 **什么是函数闭包(Closure)?**
 ```
 即使外部函数已经执行完毕, 内部函数也可以访问外部函数的变量
 
-🌙 闭包原理, 内部函数对象的__closure__存储了外部函数的变量
+🌙 闭包原理: 内部函数对象的__closure__存储了外部函数的变量
 ```
 
 # 3. 标准库
-## 基本类型
+## 内置(built-in)模块
 **python中常用的内置类型有哪些?**
 ```
 🌟 int float bool None
@@ -175,11 +170,7 @@ Exception
 🌙 初始化时 1 = int类型 1.0 = float类型
 🌙 初始化时 [1, 2, ""] = list类型 {1, 2} = set类型
 🌙 初始化时 1,2 = tuple类型 {"name": "klein"} = dict类型
-```
-
-**内置类型也继承自object吗?**
-```
-python中所有类型都继承自object, 包括内置类型
+🌙 python中所有类型都继承自object, 包括内置类型
 ```
 
 ## 模块
