@@ -85,6 +85,7 @@ python支持多继承, 使用MRO(method resolve order)解决method冲突问题, 
 **常见的内置magic variable有哪些?**
 ```
 🌟 __name__: 模块名/类名/方法名
+🌟 __doc__: 代码中的文档注释
 🌟 __class__: obj.__class__返回当前对象的type
 🌟 __bases__: obj.__bases__返回父类元组
 🌟 __dict__: obj.__dict__返回一个字典, key=属性名, value=值, 可动态修改
