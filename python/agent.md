@@ -73,7 +73,34 @@ RAG: 将知识文档/长期记忆存储到向量数据库中, 用户使用时匹
 ## Tool
 *LLM怎么调用工具?*
 ```
+🌟 方式一: 在提示词中添加工具schema并明确要求以JSON格式表示调用，由agent解析输出结果
+🌟 方式二: 部分LLM原生支持Tool Calling
 
+🌙 原生Tool Calling在API层面，会有单独的入参（工具列表）和出参（工具调用）
+```
+
+*原生Tool Calling怎么实现的?*
+```
+通过SFT(Supervised Fine-Tuning，监督微调)让LLM学会工具调用能力。
+LLM返回的原始token中包含特殊的工具token，这些token是人工加入词表后通过训练习得的。
+
+🌙 LLM的训练过程分为两个阶段: 
+    1. 预训练: 使用广义语言数据（无特殊token，培养泛化能力）
+    2. SFT: 使用带特殊token的工具调用数据集训练
+🌙 SFT阶段训练语料中，包含大量工具调用相关的特殊token样本
+🌙 推理引擎可配置约束解码(Constraint Decoding)，强制LLM输出符合指定Schema的工具调用格式
+```
+
+*推理引擎和LLM的关系?*
+```
+🌟 LLM本身是一组文件（权重参数+配置+词表），描述神经网络的结构和参数
+🌟 推理引擎是LLM的"运行时"，主要作用有:
+* 将模型加载到GPU显存中
+* 将矩阵运算编译为高效的GPU kernel（如CUDA）
+* KV Cache管理，避免重复计算
+* 负责推理全流程: 
+    文本 → Tokenize → 嵌入 → 前向传播获取Logits（未归一化的概率分布向量） 
+    → 根据Logits和采样策略（temperature/top-p等）决定输出Token
 ```
 
 
