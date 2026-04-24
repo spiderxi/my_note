@@ -16,6 +16,7 @@
 🌟pip和conda两者都为python包管理工具， conda额外支持环境(venv)管理
 
 🌙 miniconda = conda + 一些预装包
+🌙 pip本身也是一个包, 并python原生自带pip
 ```
 
 **什么是python包？**
