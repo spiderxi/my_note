@@ -180,6 +180,14 @@ _多模态是怎么实现的?_
 🌙 不同模态直接会插入分割token: [TEXT] 描述这张图片 [IMAGE] <img_token_1>...<img_token_N> [AUDIO] <aud_token_1>...
 ```
 
+_讲一下BPE(Byte-pair-encoding)是怎么分词的?_
+```
+将原始文本转换为utf-8编码, 然后将一个byte视为一个子词, 重复合并频率最高的子词对(替换为新的子词)
+
+🌙 最终的词汇表中会出现类似"ing"的子词作为一个词汇
+🌙 重复合并次数越多词汇越少, 重复合并次数越少词汇语义粒度更细
+```
+
 _self-attention中Q K V三个矩阵的作用?_
 ```
 示例: "The cat sat because it was tired", 假设嵌入维度C=6, 注意力维度H=2
@@ -204,4 +212,25 @@ v["it"]  = [ 无实体信息,  是代词 ]
 
 🌙 q=我想匹配什么  k=我能被怎样匹配 v=被选中后交流什么
 ```
+
+_MHA层后面为什么要接FFN层?_
+```
+MHA: 多头注意力层, 多个SA层并行排列, 用于token之间的信息交流
+FFN: 用于特征变换
+
+🌙 实际LLM中, MHA+FFN两层前后都会进行残差连接并且添加LayerNorm层, 并且一个LLM会重复MHA+FFN的结构很多层(GPT-3=96层)
+🌙 MHA的计算复杂度是O(N^2), N=上下文长度, 要支持更高的上下文需要改进(如稀疏注意力机制)
+```
+
+_KV cache的作用?_
+```
+KV cache用于推理阶段加速推理, 核心原理在于复用之前token的key和value
+```
+
+_什么是MOE架构?_
+
+```
+将Transformer中的FFN层替换为 一个路由Layer+多个FFN (每个FFN是一个专家)
+```
+
 
