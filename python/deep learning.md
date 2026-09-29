@@ -219,4 +219,7 @@ _什么是MOE架构?_
 将Transformer中的FFN层替换为 一个路由Layer+多个FFN (每个FFN是一个专家)
 ```
 
-
+## TL
+循环网络 + 预测编码 + 强化学习
+Forward-Forward（前向-前向）
+Hebbian 学习、STDP 和局部学习规则
